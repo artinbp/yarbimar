@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Media;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,6 +12,12 @@ use Symfony\Component\HttpFoundation\Response;
 class MediaApiController extends Controller
 {
     private const MEDIA_PER_PAGE = 8;
+
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum');
+        $this->middleware('role:'. join(',', [Role::ROLE_SUPER_ADMIN, Role::ROLE_ADMIN]));
+    }
 
     public function list() {
         $media = Media::paginate(self::MEDIA_PER_PAGE);

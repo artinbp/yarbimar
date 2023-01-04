@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 
 /*
@@ -15,12 +14,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('/register', [AuthController::class, 'register']);
-
 Route::get('/', function () {
     return view('welcome');
-});
-
-Route::get('/test', function(Request $request) {
-    dd($request->arr);
 });

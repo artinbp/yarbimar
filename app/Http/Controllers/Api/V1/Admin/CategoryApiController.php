@@ -14,8 +14,8 @@ class CategoryApiController extends Controller
 
     public function __construct()
     {
-        // $this->middleware('auth:sanctum');
-        // $this->middleware('role:'. join(',', [Role::ROLE_SUPER_ADMIN, Role::ROLE_ADMIN]));
+        $this->middleware('auth:sanctum');
+        $this->middleware('role:'. join(',', [Role::ROLE_SUPER_ADMIN, Role::ROLE_ADMIN]));
     }
 
     public function list() {
@@ -26,8 +26,8 @@ class CategoryApiController extends Controller
     
     public function create(Request $request) {
         $fields = $request->validate([
-            'title'     => ['required'],
-            'parent_id' => ['filled', 'numeric', 'exists:categories,id'],
+            'title'       => ['required', 'filled'],
+            'parent_id'   => ['filled', 'numeric', 'exists:categories,id'],
             'description' => ['filled', 'string']
         ]);
 
@@ -46,8 +46,8 @@ class CategoryApiController extends Controller
 
         Category::create([
             'title'       => $fields['title'],
-            'parent_id'   => empty($request->parent_id) ? null : $request->parent_id,
-            'description' => $request->description,
+            'parent_id'   => $fields['parent_id'] ?? null,
+            'description' => $fields['description'] ?? '',
             'depth'       => $depth,
         ]);
 
@@ -61,9 +61,9 @@ class CategoryApiController extends Controller
     }
 
     public function update(Request $request, $id) {
-        $request->validate(['title' =>  ['filled']]);
+        $fields = $request->validate(['title' =>  ['filled']]);
 
-        Category::findOrFail($id)->update($request->all());
+        Category::findOrFail($id)->update($fields);
 
         return response()->json(['message' => 'Category successfully updated'], Response::HTTP_OK);
     }

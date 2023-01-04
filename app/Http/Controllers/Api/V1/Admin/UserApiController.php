@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Address;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -30,7 +31,17 @@ class UserApiController extends Controller
             'name'     => ['required', 'filled', 'string'],
             'email'    => ['required', 'filled', 'email', 'unique:users,email'],
             'password' => ['required', 'filled', 'confirmed'],
-            'roles.*'  => ['required', 'filled', 'distinct', 'exists:roles,id']
+            'roles.*'  => ['required', 'filled', 'distinct', 'exists:roles,id'],
+            'addresses'  => ['required', 'array', 'min:1'],
+            'addresses.*.address'           => ['required', 'filled', 'string'],
+            'addresses.*.state'             => ['required', 'filled', 'string'],
+            'addresses.*.city'              => ['required', 'filled', 'string'],
+            'addresses.*.building_number'   => ['required', 'filled', 'numeric'],
+            'addresses.*.unit_number'       => ['filled', 'numeric'],
+            'addresses.*.zip_code'          => ['required', 'filled', 'numeric'],
+            'addresses.*.receiver_first_name' => ['required', 'filled', 'string'],
+            'addresses.*.receiver_last_name' => ['required', 'filled', 'string'],
+            'addresses.*.receiver_phone'     => ['required',  'filled'],
         ]);
 
         DB::transaction(function() use($fields) {
@@ -41,6 +52,7 @@ class UserApiController extends Controller
             ]);
             
             $user->roles()->attach($fields['roles']);
+            $user->address()->createMany($fields['addresses']);
         });
 
         return response()->json(['message' => 'User successfully created'], Response::HTTP_CREATED);
@@ -68,9 +80,17 @@ class UserApiController extends Controller
     }
 
     public function delete($id) {
+        $this->middleware('role:'. join(',', [Role::ROLE_SUPER_ADMIN]));
+
         $user = User::findOrFail($id);
+        if ($user->hasRole(Role::ROLE_SUPER_ADMIN)) {
+            return response()->json([
+                'message' => 'User with super admin role can not be deleted'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
         $user->destroy();
 
-        return response()->json(['User successfully deleted'], Response::HTTP_OK);
+        return response()->json(['message' => 'User successfully deleted'], Response::HTTP_OK);
     }
 }

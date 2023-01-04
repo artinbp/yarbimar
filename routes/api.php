@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthApiController as V1AuthApiController;
+use App\Http\Controllers\Api\V1\AddressApiController as V1AddressApiController;
 use App\Http\Controllers\Api\V1\CategoryApiController as V1CategoryApiController;
 use App\Http\Controllers\Api\V1\ProductApiController as V1ProductApiController;
 use App\Http\Controllers\Api\V1\OrderApiController as V1OrderApiController;
@@ -33,6 +34,12 @@ Route::middleware('auth:sanctum')->get('/v1/user', function (Request $request) {
 Route::post('/v1/auth/register', [V1AuthApiController::class, 'register']);
 Route::post('/v1/auth/login', [V1AuthApiController::class, 'login']);
 Route::post('/v1/auth/logout', [V1AuthApiController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::get('/v1/address', [V1AddressApiController::class, 'list']);
+Route::post('/v1/address', [V1AddressApiController::class, 'create']);
+Route::get('/v1/address/{id}', [V1AddressApiController::class, 'read']);
+Route::patch('/v1/address/{id}', [V1AddressApiController::class, 'update']);
+Route::delete('/v1/address/{id}', [V1AddressApiController::class, 'delete']);
 
 Route::get('/v1/admin/categories', [V1AdminCategoryApiController::class, 'list']);
 Route::post('/v1/admin/categories', [V1AdminCategoryApiController::class, 'create']);

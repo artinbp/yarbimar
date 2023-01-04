@@ -18,8 +18,18 @@ class AuthApiController extends Controller
     public function register(Request $request) {
         $fields = $request->validate([
             'name'     => ['required', 'filled', 'string'],
-            'email'    => ['required', 'filled', 'string', 'unique:users,email', 'email'],
+            'email'    => ['required', 'filled', 'email', 'unique:users,email'],
             'password' => ['required', 'filled', 'string', 'confirmed'],
+            'addresses'  => ['required', 'array', 'min:1'],
+            'addresses.*.address'           => ['required', 'filled', 'string'],
+            'addresses.*.state'             => ['required', 'filled', 'string'],
+            'addresses.*.city'              => ['required', 'filled', 'string'],
+            'addresses.*.building_number'   => ['required', 'filled', 'numeric'],
+            'addresses.*.unit_number'       => ['filled', 'numeric'],
+            'addresses.*.zip_code'          => ['required', 'filled', 'numeric'],
+            'addresses.*.receiver_first_name' => ['required', 'filled', 'string'],
+            'addresses.*.receiver_last_name' => ['required', 'filled', 'string'],
+            'addresses.*.receiver_phone'     => ['required',  'filled'],
         ]);
 
         $token = "";
@@ -32,6 +42,7 @@ class AuthApiController extends Controller
     
             $customerRole = Role::where('name', Role::ROLE_CUSTOMER)->get();
             $user->roles()->attach($customerRole);
+            $user->address()->createMany($fields['addresses']);
 
             $token = $user->createToken(self::TOKEN_NAME)->plainTextToken;
         });
@@ -50,7 +61,7 @@ class AuthApiController extends Controller
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             return response([
                 'message' => "Bad credentials"
-            ], 401);
+            ], Response::HTTP_UNAUTHORIZED);
         }
 
         $token = $user->createToken(self::TOKEN_NAME)->plainTextToken;
@@ -61,7 +72,7 @@ class AuthApiController extends Controller
     public function logout() {  
         auth()->user()->tokens()->delete();
 
-        return response()->json(['message' => 'Logged out'], 200);
+        return response()->json(['message' => 'Logged out'], Response::HTTP_OK);
     }
 }
  

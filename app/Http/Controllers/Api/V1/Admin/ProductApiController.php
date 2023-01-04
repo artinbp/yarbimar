@@ -15,8 +15,8 @@ class ProductApiController extends Controller
 
     public function __construct()
     {
-        // $this->middleware('auth:sanctum');
-        // $this->middleware('role:'. join(',', [Role::ROLE_SUPER_ADMIN, Role::ROLE_ADMIN]));
+        $this->middleware('auth:sanctum');
+        $this->middleware('role:'. join(',', [Role::ROLE_SUPER_ADMIN, Role::ROLE_ADMIN]));
     }
 
     public function list(Request $request) {
@@ -67,7 +67,7 @@ class ProductApiController extends Controller
 
         $product = Product::findOrFail($id);
         $product->update($request->all());
-        $product->sync($fields['media']);
+        $product->media()->sync($fields['media']);
 
         return response()->json(['message' => 'Product successfully updated'], Response::HTTP_OK);
     }

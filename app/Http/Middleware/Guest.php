@@ -11,7 +11,7 @@ class Guest
     public function handle($request, Closure $next, $role)
     {
         if (! $request->user()->hasRole($role)) {
-            response()->json('Unauthorized.', Response::HTTP_UNAUTHORIZED);
+            response()->json('Unauthenticated.', Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);

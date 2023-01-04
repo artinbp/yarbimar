@@ -52,12 +52,15 @@ class OrderApiController extends Controller
     }
 
     public function read($id) {
+        // TODO: check whether the user owns the order
+
         $order = Order::with('products')->findOrFail($id);
 
         return response()->json($order, Response::HTTP_OK);
     }
 
     public function cancel($id) {
+        // TODO: check whether the user owns the order
         $order = Order::findOrFail($id);
        if ($order->status != Order::STATUS_UNPAID) {
             return response()->json([
@@ -72,6 +75,8 @@ class OrderApiController extends Controller
     }
 
     public function purchase($id) {
+        // TODO: check whether the user owns the order
+
         // $order = Order::findOrFail($id);
         // if ($order->status != Order::STATUS_UNPAID) {
         //     return response()->json([
