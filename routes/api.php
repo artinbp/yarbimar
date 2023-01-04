@@ -35,11 +35,11 @@ Route::post('/v1/auth/register', [V1AuthApiController::class, 'register']);
 Route::post('/v1/auth/login', [V1AuthApiController::class, 'login']);
 Route::post('/v1/auth/logout', [V1AuthApiController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('/v1/address', [V1AddressApiController::class, 'list']);
-Route::post('/v1/address', [V1AddressApiController::class, 'create']);
-Route::get('/v1/address/{id}', [V1AddressApiController::class, 'read']);
-Route::patch('/v1/address/{id}', [V1AddressApiController::class, 'update']);
-Route::delete('/v1/address/{id}', [V1AddressApiController::class, 'delete']);
+Route::get('/v1/addresses', [V1AddressApiController::class, 'list']);
+Route::post('/v1/addresses', [V1AddressApiController::class, 'create']);
+Route::get('/v1/addresses/{id}', [V1AddressApiController::class, 'read']);
+Route::patch('/v1/addresses/{id}', [V1AddressApiController::class, 'update']);
+Route::delete('/v1/addresses/{id}', [V1AddressApiController::class, 'delete']);
 
 Route::get('/v1/admin/categories', [V1AdminCategoryApiController::class, 'list']);
 Route::post('/v1/admin/categories', [V1AdminCategoryApiController::class, 'create']);
