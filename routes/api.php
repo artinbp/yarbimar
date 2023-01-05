@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Admin\MediaApiController as V1AdminMediaApiContr
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/v1/user', function (Request $request) {
-    return $request->user();
+    return $request->user()->with('roles')->get();
 });
 
 Route::post('/v1/auth/register', [V1AuthApiController::class, 'register']);
