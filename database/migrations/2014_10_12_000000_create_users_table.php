@@ -25,16 +25,6 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
-
-        DB::transaction(function() {
-            $user = User::create([
-                'name'     => 'Super Admin',
-                'email'    => 'superadmin@example.com',
-                'password' => bcrypt('superadmin'),
-            ]);
-            
-            $user->roles()->attach(Role::ROLE_SUPER_ADMIN);
-        });
     }
 
     /**
