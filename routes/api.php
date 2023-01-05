@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::middleware('auth:sanctum')->get('/v1/user', function (Request $request) {
-    return $request->user()['id'];
+    return $request->user();
 });
 
 Route::post('/v1/auth/register', [V1AuthApiController::class, 'register']);
