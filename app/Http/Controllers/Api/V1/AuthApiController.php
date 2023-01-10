@@ -20,7 +20,7 @@ class AuthApiController extends Controller
             'name'     => ['required', 'filled', 'string'],
             'email'    => ['required', 'filled', 'email', 'unique:users,email'],
             'password' => ['required', 'filled', 'string', 'confirmed'],
-            'addresses'  => ['required', 'array', 'min:1'],
+            'addresses'  => ['array'],
             'addresses.*.address'           => ['required', 'filled', 'string'],
             'addresses.*.state'             => ['required', 'filled', 'string'],
             'addresses.*.city'              => ['required', 'filled', 'string'],
@@ -42,7 +42,10 @@ class AuthApiController extends Controller
     
             $customerRole = Role::where('name', Role::ROLE_CUSTOMER)->get();
             $user->roles()->attach($customerRole);
-            $user->address()->createMany($fields['addresses']);
+            
+            if (isset($fields['addresses']) && count($fields['addresses'])) {
+                $user->address()->createMany($fields['addresses']);
+            }
 
             $token = $user->createToken(self::TOKEN_NAME)->plainTextToken;
         });
