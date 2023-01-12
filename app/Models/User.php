@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -18,7 +20,9 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'username',
+        'first_name',
+        'last_name',
         'email',
         'password',
     ];
@@ -31,6 +35,7 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'role_id',
     ];
 
     /**
@@ -42,24 +47,25 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function roles() {
-        return $this->belongsToMany(Role::class);
-    }
+    protected $with = ['role'];
 
-    public function hasRole($role)
+    public function role(): BelongsTo
     {
-        if ($this->roles()->where('name', $role)->first()) {
-            return true;
-        }
-        
-        return false;
+        return $this->belongsTo(Role::class);
     }
 
-    public function orders() {
+    public function hasRole($role): bool
+    {
+        return $this->role->name == $role;
+    }
+
+    public function orders(): HasMany
+    {
         return $this->hasMany(Order::class);
     }
 
-    public function address() {
+    public function address(): HasMany
+    {
         return $this->hasMany(Address::class);
     }
 }

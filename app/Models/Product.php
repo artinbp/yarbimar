@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Category;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -24,22 +25,26 @@ class Product extends Model
         'stock',
     ];
 
+    protected $with = ['media', 'categories'];
+
     protected $appends = ['thumbnail_url', 'selling_price'];
 
     protected $casts = ['selling_price' => 'decimal'];
 
-    public function categories() {
+    public function categories(): BelongsToMany
+    {
         return $this->belongsToMany(Category::class, 'product_category', 'product_id', 'category_id');
     }
 
-    public function media() {
+    public function media(): BelongsToMany
+    {
         return $this->belongsToMany(Media::class);
     }
 
     public function scopeFilter(Builder $builder, Request $request)
     {
         if ($request->has('search')) {
-            $builder->whereFullText(['title', 'description'], $request->input('search'));   
+            $builder->whereFullText(['title', 'description'], $request->input('search'));
         }
 
         if ($request->has('gte')) {

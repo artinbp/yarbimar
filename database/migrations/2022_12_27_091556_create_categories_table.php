@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->nullable(false);
-            $table->integer('parent_id')->unsigned()->nullable();
+            $table->integer('parent_id')->unsigned()->nullable()->default(null);
             $table->text("description")->nullable();
             $table->boolean('disabled')->default(false);
             $table->integer('depth')->unsigned();

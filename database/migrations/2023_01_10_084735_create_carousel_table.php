@@ -13,14 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('role_user', function (Blueprint $table) {
-            $table->integer('role_id')->unsigned();
-            $table->integer('user_id')->unsigned();
+        Schema::create('carousel', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->integer('media_id')->unsigned()->nullable();
+            $table->text('description');
+            $table->string('url');
             $table->timestamps();
 
-            
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('media_id')->references('id')->on('media')->onDelete('cascade');
         });
     }
 
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('role_user');
+        Schema::dropIfExists('carousel');
     }
 };

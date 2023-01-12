@@ -1,34 +1,29 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Admin;
+namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\Media;
-use App\Models\Role;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
+use function response;
 
-class MediaApiController extends Controller
+class MediaController extends Controller
 {
     private const MEDIA_PER_PAGE = 8;
 
-    public function __construct()
+    public function list(): JsonResponse
     {
-        $this->middleware('auth:sanctum');
-        $this->middleware('role:'. join(',', [Role::ROLE_SUPER_ADMIN, Role::ROLE_ADMIN]));
-    }
-
-    public function list() {
         $media = Media::paginate(self::MEDIA_PER_PAGE);
 
         return response()->json($media, Response::HTTP_OK);
     }
 
-    public function create(Request $request) {
-        $request->validate([
-            'file' => ['required', 'file'],
-        ]);
+    public function create(Request $request): JsonResponse
+    {
+        $request->validate(['file' => ['required', 'file']]);
 
         $file = $request->file('file');
         $hashName = $file->hashName();
@@ -43,22 +38,23 @@ class MediaApiController extends Controller
             attributes: [
                 'file_name' => $file->getClientOriginalName(),
                 'mime_type' => $file->getClientMimeType(),
-                'path'      => $path,
-                'size'      => $file->getSize(),
+                'path' => $path,
+                'size' => $file->getSize(),
             ],
         );
 
         return response()->json([
-            'id'        => $media->id,
+            'id' => $media->id,
             'file_name' => $file->getClientOriginalName(),
             'mime_type' => $file->getClientMimeType(),
-            'path'      => $path,
-            'size'      => $file->getSize(),
-            'url'       => Storage::url($path)
+            'path' => $path,
+            'size' => $file->getSize(),
+            'url' => Storage::url($path)
         ], Response::HTTP_OK);
     }
 
-    public function delete($id) {
+    public function delete($id): JsonResponse
+    {
         $media = Media::findOrFail($id);
         $media->delete();
 

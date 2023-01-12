@@ -1,67 +1,77 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\Payment;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
-use Shetabit\Multipay\Invoice;
-use Shetabit\Payment\Facade\Payment as SHPayment;
+use function response;
 
 
-class OrderApiController extends Controller
+class OrderController extends Controller
 {
     private const ORDER_PER_PAGE = 8;
 
-    public function __construct()
+    public function list(): JsonResponse
     {
-        $this->middleware('auth:sanctum');
-    }
-
-    public function list() {
-        $orders = Order::with('products')->paginate(self::ORDER_PER_PAGE);
+        $orders = Order::paginate(self::ORDER_PER_PAGE);
 
         return response()->json($orders, Response::HTTP_OK);
     }
-    
-    public function create(Request $request) {
+
+    public function create(Request $request): JsonResponse
+    {
         $fields = $request->validate([
             'products.*' => ['required', 'filled', 'numeric', 'distinct', 'exists:products,id'],
         ]);
 
-        $products = Product::find($fields['products']);
-    
+        $products = Product::findOrFail($fields['products']);
+
         $total = 0;
         foreach ($products as $product) {
             $total += $product->selling_price;
         }
 
-        $order = Order::create([
-            'total'   => $total,
-            'status'  => Order::STATUS_UNPAID,
-            'user_id' => $request->user()->id,
-        ]);
+        $id = "";
+        DB::transaction(function() use($request, $fields, $total, &$id) {
+            $order = Order::create([
+                'total'   => $total,
+                'status'  => Order::STATUS_UNPAID,
+            ]);
 
-        $order->products()->attach($fields['products']);
+            $order->products()->attach($fields['products']);
+            $request->user()->orders()->save($order);
+            $id = $order->id;
+        });
 
-        return response()->json(['id' => $order->id, 'message' => 'Order successfully created'], Response::HTTP_CREATED);
+        $order = Order::findOrFail($id);
+
+        return response()->json($order, Response::HTTP_CREATED);
     }
 
-    public function read($id) {
-        // TODO: check whether the user owns the order
-
+    public function read(Request $request, $id): JsonResponse
+    {
         $order = Order::with('products')->findOrFail($id);
+
+        if ($request->user()->id !== $order->user_id) {
+            return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
+        }
 
         return response()->json($order, Response::HTTP_OK);
     }
 
-    public function cancel($id) {
-        // TODO: check whether the user owns the order
+    public function cancel(Request $request, $id): JsonResponse
+    {
         $order = Order::findOrFail($id);
+
+        if ($request->user()->id !== $order->user_id) {
+            return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
+        }
+
        if ($order->status != Order::STATUS_UNPAID) {
             return response()->json([
                 'message' => 'Only unpaid orders can get cancelled'],
@@ -74,10 +84,15 @@ class OrderApiController extends Controller
         return response()->json(['message' => 'Order cancelled']);
     }
 
-    public function purchase($id) {
-        // TODO: check whether the user owns the order
+    public function purchase(Request $request, $id): JsonResponse
+    {
+         $order = Order::findOrFail($id);
 
-        // $order = Order::findOrFail($id);
+        // TODO: check whether the user owns the order
+        if ($request->user()->id !== $order->user_id) {
+            return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
+        }
+
         // if ($order->status != Order::STATUS_UNPAID) {
         //     return response()->json([
         //         'message' => 'Order may already paid or got cancelled'],
@@ -89,7 +104,7 @@ class OrderApiController extends Controller
 
         // $ti = 0;
         // $response = Payment::purchase(
-        //     (new Invoice)->amount(1000), 
+        //     (new Invoice)->amount(1000),
         //     function($driver, $transactionId) {
         //         // Store transactionId in database.
         //         // We need the transactionId to verify payment in the future.

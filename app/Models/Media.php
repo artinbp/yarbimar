@@ -17,4 +17,9 @@ class Media extends Model
     public function getUrlAttribute() {
         return Storage::url($this->path);
     }
+
+    public function carousel()
+    {
+        return $this->hasMany(Carousel::class);
+    }
 }
