@@ -29,18 +29,19 @@ class ProductController extends Controller
             'categories.*' => ['required', 'numeric', 'distinct', 'exists:categories,id'],
             'price' => ['required', 'numeric'],
             'discount' => ['numeric', 'min:0', 'max:100'],
-            'media.*' => ['filled', 'numeric', 'distinct'],
+            'media.*' => ['filled', 'numeric', 'distinct', 'exists:media,id'],
             'thumbnail_path' => ['required', 'string', 'exists:media,path'],
             'stock' => ['required', 'numeric'],
         ]);
 
-        $product = [];
-        DB::transaction(function () use ($fields, &$product) {
+        $id = 0;
+        DB::transaction(function () use ($fields, &$id) {
             $product = Product::create($fields);
+            $id = $product->id;
             $product->categories()->attach($fields['categories']);
             $product->media()->attach($fields['media'] ?? []);
-            $product = $product->first();
         });
+        $product = Product::findOrFail($id);
 
         return response()->json($product, Response::HTTP_CREATED);
     }
@@ -59,9 +60,9 @@ class ProductController extends Controller
             'description' => ['filled', 'string'],
             'categories.*' => ['filled', 'numeric', 'distinct', 'exists:categories,id'],
             'price' => ['filled', 'numeric'],
-            'discount' => ['numeric', 'min:0', 'max:100'],
-            'media.*' => ['url', 'distinct', 'exists:media,id'],
-            'thumbnail_path' => ['filled', 'url'],
+            'discount' => ['filled', 'numeric', 'min:0', 'max:100'],
+            'media.*' => ['filled', 'distinct', 'exists:media,id'],
+            'thumbnail_path' => ['filled', 'string', 'exists:media,path'],
             'stock' => ['filled', 'numeric'],
         ]);
 
