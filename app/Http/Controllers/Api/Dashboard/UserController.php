@@ -38,10 +38,10 @@ class UserController extends Controller
             'addresses.*.city' => ['required', 'filled', 'string'],
             'addresses.*.building_number' => ['required', 'filled', 'numeric'],
             'addresses.*.unit_number' => ['filled', 'numeric'],
-            'addresses.*.zip_code' => ['required', 'filled', 'numeric'],
+            'addresses.*.zip_code' => ['required', 'filled', 'string'],
             'addresses.*.receiver_first_name' => ['required', 'filled', 'string'],
             'addresses.*.receiver_last_name' => ['required', 'filled', 'string'],
-            'addresses.*.receiver_phone' => ['required', 'filled'],
+            'addresses.*.receiver_phone' => ['required', 'filled', 'string'],
         ]);
 
 

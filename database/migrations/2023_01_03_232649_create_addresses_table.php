@@ -18,8 +18,8 @@ return new class extends Migration
             $table->text('address');
             $table->string('state');
             $table->string('city');
-            $table->string('building_number');
-            $table->string('unit_number')->nullable();
+            $table->string('building_number')->nullable()->default(null);
+            $table->string('unit_number')->nullable()->default(null);
             $table->string('zip_code');
             $table->string('receiver_first_name');
             $table->string('receiver_last_name');

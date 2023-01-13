@@ -29,10 +29,10 @@ class AddressController extends Controller
             'city' => ['required', 'filled', 'string'],
             'building_number' => ['required', 'filled', 'numeric'],
             'unit_number' => ['filled', 'numeric'],
-            'zip_code' => ['required', 'filled', 'numeric'],
+            'zip_code' => ['required', 'filled', 'string'],
             'receiver_first_name' => ['required', 'filled', 'string'],
             'receiver_last_name' => ['required', 'filled', 'string'],
-            'receiver_phone' => ['required', 'filled'],
+            'receiver_phone' => ['required', 'filled', 'string'],
         ]);
 
         $address = [];
