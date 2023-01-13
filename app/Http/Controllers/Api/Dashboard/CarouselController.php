@@ -39,11 +39,13 @@ class CarouselController extends Controller
         ]);
 
         $media = Media::findOrFail($fields['media_id']);
-        $carousel = [];
-        DB::transaction(function() use($fields, $media, &$carousel) {
+        $id = 0;
+        DB::transaction(function () use ($fields, $media, &$id) {
             $carousel = Carousel::create($fields);
+            $id = $carousel->id;
             $media->carousel()->save($carousel);
         });
+        $carousel = Carousel::findOrFail($id);
 
         return response()->json($carousel, Response::HTTP_CREATED);
     }
@@ -66,12 +68,12 @@ class CarouselController extends Controller
             'url' => ['filled', 'url'],
         ]);
 
-        DB::transaction(function() use($carousel, $fields) {
+        DB::transaction(function () use ($carousel, $fields) {
             $carousel->update($fields);
 
             if (isset($fields['media_id']) && !empty($fields['media_id'])) {
                 $media = Media::findOrFail($fields['media_id']);
-                $carousel->media()->save($media);
+                $media->carousel()->save($carousel);
             }
         });
 
