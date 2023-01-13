@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Dashboard\User\CreateUserRequest;
+use App\Http\Requests\Api\Dashboard\User\UpdateUserRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -23,27 +25,9 @@ class UserController extends Controller
         return response()->json($users, Response::HTTP_OK);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateUserRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'username' => ['required', 'filled', 'string', 'unique:users,username'],
-            'first_name' => ['required', 'filled', 'string'],
-            'last_name' => ['required', 'filled', 'string'],
-            'email' => ['required', 'filled', 'email', 'unique:users,email'],
-            'password' => ['required', 'filled', 'confirmed'],
-            'role' => ['required', 'filled', 'distinct', 'exists:roles,id'],
-            'addresses' => ['array'],
-            'addresses.*.address' => ['required', 'filled', 'string'],
-            'addresses.*.state' => ['required', 'filled', 'string'],
-            'addresses.*.city' => ['required', 'filled', 'string'],
-            'addresses.*.building_number' => ['required', 'filled', 'numeric'],
-            'addresses.*.unit_number' => ['filled', 'numeric'],
-            'addresses.*.zip_code' => ['required', 'filled', 'string'],
-            'addresses.*.receiver_first_name' => ['required', 'filled', 'string'],
-            'addresses.*.receiver_last_name' => ['required', 'filled', 'string'],
-            'addresses.*.receiver_phone' => ['required', 'filled', 'string'],
-        ]);
-
+        $fields = $request->validated();
 
         $role = Role::findOrFail($fields['role']);
         if ($role->name == Role::ROLE_SUPER_ADMIN) {
@@ -75,18 +59,11 @@ class UserController extends Controller
         return response()->json($user, Response::HTTP_OK);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateUserRequest $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
 
-        $fields = $request->validate([
-            'username' => ['filled', 'string', 'unique:users,username,'.$user->id],
-            'first_name' => ['filled', 'string'],
-            'last_name' => ['filled', 'string'],
-            'email' => ['filled', 'email', 'unique:users,email,'.$user->id],
-            'password' => ['filled', 'confirmed'],
-            'role' => ['filled', 'distinct', 'exists:roles,id'],
-        ]);
+        $fields = $request->validated();
 
         $role = Role::findOrFail($fields['role']);
         if ($role->name == Role::ROLE_SUPER_ADMIN) {

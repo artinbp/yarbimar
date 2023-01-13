@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Dashboard\Media\CreateMediaRequest;
 use App\Models\Media;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use function response;
@@ -21,9 +21,9 @@ class MediaController extends Controller
         return response()->json($media, Response::HTTP_OK);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateMediaRequest $request): JsonResponse
     {
-        $request->validate(['file' => ['required', 'file']]);
+        $request->validated();
 
         $file = $request->file('file');
         $hashName = $file->hashName();

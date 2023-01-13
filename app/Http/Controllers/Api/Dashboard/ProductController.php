@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Dashboard\Product\CreateProductRequest;
+use App\Http\Requests\Api\Dashboard\Product\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,18 +23,9 @@ class ProductController extends Controller
         return response()->json($products, Response::HTTP_OK);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateProductRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'title' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'categories.*' => ['required', 'numeric', 'distinct', 'exists:categories,id'],
-            'price' => ['required', 'numeric'],
-            'discount' => ['numeric', 'min:0', 'max:100'],
-            'media.*' => ['filled', 'numeric', 'distinct', 'exists:media,id'],
-            'thumbnail_path' => ['required', 'string', 'exists:media,path'],
-            'stock' => ['required', 'numeric'],
-        ]);
+        $fields = $request->validated();
 
         $id = 0;
         DB::transaction(function () use ($fields, &$id) {
@@ -53,18 +46,9 @@ class ProductController extends Controller
         return response()->json($product, Response::HTTP_OK);
     }
 
-    public function update($id, Request $request): JsonResponse
+    public function update(UpdateProductRequest $request, $id): JsonResponse
     {
-        $fields = $request->validate([
-            'title' => ['filled', 'string'],
-            'description' => ['filled', 'string'],
-            'categories.*' => ['filled', 'numeric', 'distinct', 'exists:categories,id'],
-            'price' => ['filled', 'numeric'],
-            'discount' => ['filled', 'numeric', 'min:0', 'max:100'],
-            'media.*' => ['filled', 'distinct', 'exists:media,id'],
-            'thumbnail_path' => ['filled', 'string', 'exists:media,path'],
-            'stock' => ['filled', 'numeric'],
-        ]);
+        $fields = $request->validated();
 
         $product = Product::findOrFail($id);
         DB::transaction(function () use (&$product, $fields) {

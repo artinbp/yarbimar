@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Dashboard\Carousel\CreateCarouselRequest;
+use App\Http\Requests\Api\Dashboard\Carousel\UpdateCarouselRequest;
 use App\Models\Carousel;
 use App\Models\Media;
 use Illuminate\Http\JsonResponse;
@@ -22,21 +24,16 @@ class CarouselController extends Controller
         return response()->json($carousel, Response::HTTP_OK);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateCarouselRequest $request): JsonResponse
     {
+        $fields = $request->validated();
+
         $count = Carousel::count();
         if ($count >= self::MAX_CAROUSEL) {
             return response()->json([
                 'message' => 'You can\'t create carousel more than ' . self::MAX_CAROUSEL
             ], Response::HTTP_FORBIDDEN);
         }
-
-        $fields = $request->validate([
-            'title' => ['required', 'filled'],
-            'media_id' => ['required', 'filled', 'numeric', 'exists:media,id'],
-            'description' => ['required', 'filled', 'string'],
-            'url' => ['required', 'filled', 'url'],
-        ]);
 
         $media = Media::findOrFail($fields['media_id']);
         $id = 0;
@@ -57,16 +54,11 @@ class CarouselController extends Controller
         return response()->json($carousel, Response::HTTP_OK);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateCarouselRequest $request, $id): JsonResponse
     {
         $carousel = Carousel::findOrFail($id);
 
-        $fields = $request->validate([
-            'title' => ['filled'],
-            'media_id' => ['filled', 'numeric', 'exists:media,id'],
-            'description' => ['filled', 'string'],
-            'url' => ['filled', 'url'],
-        ]);
+        $fields = $request->validated();
 
         DB::transaction(function () use ($carousel, $fields) {
             $carousel->update($fields);

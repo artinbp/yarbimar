@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Dashboard\User\UpdateUserRequest;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
@@ -29,16 +30,11 @@ class OrderController extends Controller
         return response()->json($order, Response::HTTP_OK);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateUserRequest $request, $id): JsonResponse
     {
         $order = Order::findOrFail($id);
 
-        $fields = $request->validate([
-            'products'   => ['array'],
-            'products.*' => ['filled', 'numeric', 'distinct', 'exists:products,id'],
-            'status'     => ['filled', 'string', 'in:pending,processing,completed,cancelled'],
-            'user_id'    => ['filled', 'numeric', 'exists:users,id'],
-        ]);
+        $fields = $request->validated();
 
         $products = Product::findOrFail($fields['products']);
 

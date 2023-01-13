@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Dashboard\Category\CreateCategoryRequest;
+use App\Http\Requests\Api\Dashboard\Category\UpdateCategoryRequest;
 use App\Models\Category;
-use App\Models\Role;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use function response;
 
@@ -21,14 +21,9 @@ class CategoryController extends Controller
         return response()->json($categoriesWithSubs, Response::HTTP_OK);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateCategoryRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'title' => ['required', 'filled'],
-            'parent_id' => ['filled', 'numeric', 'exists:categories,id'],
-            'description' => ['required', 'filled', 'string'],
-            'boolean' => ['filled', 'boolean']
-        ]);
+        $fields = $request->validated();
 
         $depth = 0;
         if (!empty($request->parent_id)) {
@@ -57,14 +52,9 @@ class CategoryController extends Controller
         return response()->json($category, Response::HTTP_OK);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateCategoryRequest $request, $id): JsonResponse
     {
-        $fields = $request->validate([
-            'title' => ['filled'],
-            'parent_id' => ['filled', 'numeric', 'exists:categories,id'],
-            'description' => ['filled', 'string'],
-            'boolean' => ['filled', 'boolean']
-        ]);
+        $fields = $request->validated();
 
         Category::findOrFail($id)->update($fields);
         $category = Category::findOrFail($id);

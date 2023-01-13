@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Auth\LoginRequest;
+use App\Http\Requests\Api\Auth\RegisterUserRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -18,25 +20,9 @@ class AuthController extends Controller
 {
     private const TOKEN_NAME = 'myapptoken';
 
-    public function register(Request $request): JsonResponse
+    public function register(RegisterUserRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'username' => ['required', 'filled', 'string', 'unique:users,username'],
-            'first_name' => ['required', 'filled', 'string'],
-            'last_name' => ['required', 'filled', 'string'],
-            'email' => ['required', 'filled', 'email', 'unique:users,email'],
-            'password' => ['required', 'filled', 'string', 'confirmed'],
-            'addresses' => ['array'],
-            'addresses.*.address' => ['required', 'filled', 'string'],
-            'addresses.*.state' => ['required', 'filled', 'string'],
-            'addresses.*.city' => ['required', 'filled', 'string'],
-            'addresses.*.building_number' => ['required', 'filled', 'numeric'],
-            'addresses.*.unit_number' => ['filled', 'numeric'],
-            'addresses.*.zip_code' => ['required', 'filled', 'string'],
-            'addresses.*.receiver_first_name' => ['required', 'filled', 'string'],
-            'addresses.*.receiver_last_name' => ['required', 'filled', 'string'],
-            'addresses.*.receiver_phone' => ['required', 'filled', 'string'],
-        ]);
+        $fields = $request->validated();
 
         $fields['password'] = bcrypt($fields['password']);
 
@@ -57,12 +43,9 @@ class AuthController extends Controller
         return response()->json(['token' => $token], Response::HTTP_CREATED);
     }
 
-    public function login(Request $request): JsonResponse
+    public function login(LoginRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+        $fields = $request->validated();
 
         $user = User::where('email', $fields['email'])->first();
 
@@ -86,7 +69,7 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        $user = $request->user()->with('role')->get();
+        $user = $request->user()->get();
 
         return response()->json($user, Response::HTTP_OK);
     }
