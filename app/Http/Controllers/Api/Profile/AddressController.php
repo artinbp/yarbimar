@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Models\Address;
@@ -70,7 +70,9 @@ class AddressController extends Controller
         ]);
 
         $address->update($fields);
-        $address = $address->first();
+        $address = Address::where('user_id', '=', $request->user()->id)
+            ->where('id', '=', $id)->firstOrFail();
+
 
         return response()->json($address, Response::HTTP_OK);
     }

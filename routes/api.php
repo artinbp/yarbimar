@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CarouselController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\Dashboard\CarouselController as DashboardCarouselController;
 use App\Http\Controllers\Api\Dashboard\CategoryController as DashboardCategoryController;
 use App\Http\Controllers\Api\Dashboard\MediaController as DashboardMediaController;
+use App\Http\Controllers\Api\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Api\Dashboard\ProductController as DashboardProductController;
 use App\Http\Controllers\Api\Dashboard\RoleController as DashboardRoleController;
 use App\Http\Controllers\Api\Dashboard\UserController as DashboardUserController;
-use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\Profile\AddressController;
+use App\Http\Controllers\Api\Profile\OrderController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -35,11 +36,17 @@ Route::get('/v1/categories', [CategoryController::class, 'list']);
 Route::get('/v1/products', [ProductController::class, 'list']);
 Route::get('/v1/carousel', [CarouselController::class, 'list']);
 
-Route::get('/v1/orders', [OrderController::class, 'list'])->middleware('auth:sanctum');
-Route::post('/v1/orders', [OrderController::class, 'create'])->middleware('auth:sanctum');
-Route::post('/v1/orders/{id}', [OrderController::class, 'read'])->middleware('auth:sanctum');
-Route::get('/v1/orders/{id}/cancel', [OrderController::class, 'cancel'])->middleware('auth:sanctum');
-Route::get('/v1/orders/{id}/purchase', [OrderController::class, 'purchase'])->middleware('auth:sanctum');
+Route::get('/v1/profile/orders', [OrderController::class, 'list'])->middleware('auth:sanctum');
+Route::post('/v1/profile/orders', [OrderController::class, 'create'])->middleware('auth:sanctum');
+Route::get('/v1/profile/orders/{id}', [OrderController::class, 'read'])->middleware('auth:sanctum');
+Route::get('/v1/profile/orders/{id}/cancel', [OrderController::class, 'cancel'])->middleware('auth:sanctum');
+Route::get('/v1/profile/orders/{id}/purchase', [OrderController::class, 'purchase'])->middleware('auth:sanctum');
+
+Route::get('/v1/profile/addresses', [AddressController::class, 'list'])->middleware('auth:sanctum');
+Route::post('/v1/profile/addresses', [AddressController::class, 'create'])->middleware('auth:sanctum');
+Route::get('/v1/profile/addresses/{id}', [AddressController::class, 'read'])->middleware('auth:sanctum');
+Route::patch('/v1/profile/addresses/{id}', [AddressController::class, 'update'])->middleware('auth:sanctum');
+Route::delete('/v1/profile/addresses/{id}', [AddressController::class, 'delete'])->middleware('auth:sanctum');
 
 Route::get('/v1/dashboard/categories', [DashboardCategoryController::class, 'list'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::post('/v1/dashboard/categories', [DashboardCategoryController::class, 'create'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
@@ -52,6 +59,11 @@ Route::post('/v1/dashboard/products', [DashboardProductController::class, 'creat
 Route::get('/v1/dashboard/products/{id}', [DashboardProductController::class, 'read'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::patch('/v1/dashboard/products/{id}', [DashboardProductController::class, 'update'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::delete('/v1/dashboard/products/{id}', [DashboardProductController::class, 'delete'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+
+Route::get('/v1/dashboard/orders', [DashboardOrderController::class, 'list'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::get('/v1/dashboard/orders/{id}', [DashboardOrderController::class, 'read'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::patch('/v1/dashboard/orders/{id}', [DashboardOrderController::class, 'update'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::delete('/v1/dashboard/orders/{id}', [DashboardOrderController::class, 'delete'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 
 Route::get('/v1/dashboard/roles', [DashboardRoleController::class, 'list'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 

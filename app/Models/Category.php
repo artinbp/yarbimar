@@ -26,7 +26,6 @@ class Category extends Model
     protected $casts = [
         'disabled' => 'boolean'
     ];
-    protected $with = ['childrenRecursive'];
 
     public function parent(): BelongsTo
     {

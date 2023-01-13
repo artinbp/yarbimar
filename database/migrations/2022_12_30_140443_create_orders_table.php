@@ -16,9 +16,9 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
             $table->decimal('total');
-            $table->enum('status', ['unpaid', 'paid', 'unprocessed', 'processing', 'shipped', 'cancelled'])->default('unpaid');
-            $table->integer('user_id')->unsigned();
-            $table->integer('payment_id')->unsigned()->nullable();
+            $table->enum('status', ['pending', 'cancelled', 'processing', 'completed'])->default('pending');
+            $table->integer('user_id')->unsigned()->nullable()->default(null);
+            $table->integer('payment_id')->unsigned()->nullable()->default(null);
             $table->timestamps();
         });
 

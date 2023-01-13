@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
@@ -16,9 +16,9 @@ class OrderController extends Controller
 {
     private const ORDER_PER_PAGE = 8;
 
-    public function list(): JsonResponse
+    public function list(Request $request): JsonResponse
     {
-        $orders = Order::paginate(self::ORDER_PER_PAGE);
+        $orders = Order::filter($request)->paginate(self::ORDER_PER_PAGE);
 
         return response()->json($orders, Response::HTTP_OK);
     }
@@ -40,7 +40,7 @@ class OrderController extends Controller
         DB::transaction(function() use($request, $fields, $total, &$id) {
             $order = Order::create([
                 'total'   => $total,
-                'status'  => Order::STATUS_UNPAID,
+                'status'  => Order::STATUS_PENDING,
             ]);
 
             $order->products()->attach($fields['products']);
@@ -72,9 +72,9 @@ class OrderController extends Controller
             return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
         }
 
-       if ($order->status != Order::STATUS_UNPAID) {
+       if ($order->status != Order::STATUS_PENDING) {
             return response()->json([
-                'message' => 'Only unpaid orders can get cancelled'],
+                'message' => 'Only pending orders can get cancelled'],
                 Response::HTTP_BAD_REQUEST
             );
        }

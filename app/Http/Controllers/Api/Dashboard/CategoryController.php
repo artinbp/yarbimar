@@ -16,7 +16,7 @@ class CategoryController extends Controller
 
     public function list(): JsonResponse
     {
-        $categoriesWithSubs = Category::where('parent_id', null)->get();
+        $categoriesWithSubs = Category::with('childrenRecursive')->where('parent_id', null)->get();
 
         return response()->json($categoriesWithSubs, Response::HTTP_OK);
     }
