@@ -13,12 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('delivery_methods', function (Blueprint $table) {
             $table->increments('id');
-            $table->decimal('amount');
-            $table->string('provider');
-            $table->enum('status', ['unpaid', 'paid'])->default('unpaid');
-            $table->bigInteger('transaction_id');
+
+            $table->string('name');
+            $table->text('description');
+            $table->decimal('fee');
+            $table->boolean('disabled')->default(false);
+
             $table->timestamps();
         });
     }
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('delivary_methods');
     }
 };

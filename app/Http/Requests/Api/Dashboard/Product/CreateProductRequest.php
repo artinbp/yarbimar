@@ -24,14 +24,14 @@ class CreateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string'],
-            'description' => ['required', 'string'],
-            'categories.*' => ['required', 'numeric', 'distinct', 'exists:categories,id'],
-            'price' => ['required', 'numeric'],
-            'discount' => ['numeric', 'min:0', 'max:100'],
+            'title' => ['required', 'filled', 'string'],
+            'description' => ['required', 'filled', 'string'],
+            'categories.*' => ['required', 'filled', 'numeric', 'distinct', 'exists:categories,id'],
+            'price' => ['required', 'filled', 'numeric'],
+            'discount' => ['filled', 'numeric', 'min:0', 'max:100'],
             'media.*' => ['filled', 'numeric', 'distinct', 'exists:media,id'],
-            'thumbnail_path' => ['required', 'string', 'exists:media,path'],
-            'stock' => ['required', 'numeric'],
+            'thumbnail_path' => ['required', 'filled', 'string', 'exists:media,path'],
+            'stock' => ['required', 'filled', 'numeric'],
         ];
     }
 }

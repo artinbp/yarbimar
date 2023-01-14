@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Profile\Order\CreateOrderRequest;
+use App\Jobs\CancelAbandonedOrder;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -23,11 +25,9 @@ class OrderController extends Controller
         return response()->json($orders, Response::HTTP_OK);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateOrderRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'products.*' => ['required', 'filled', 'numeric', 'distinct', 'exists:products,id'],
-        ]);
+        $fields = $request->validated();
 
         $products = Product::findOrFail($fields['products']);
 
@@ -43,19 +43,27 @@ class OrderController extends Controller
                 'status'  => Order::STATUS_PENDING,
             ]);
 
-            $order->products()->attach($fields['products']);
+            $productsWithQuantity = [];
+            foreach ($fields['products'] as $product) {
+                $productsWithQuantity[] = [$product['id'] => $product['quantity']];
+            }
+
+            $order->products()->attach($productsWithQuantity);
             $request->user()->orders()->save($order);
             $id = $order->id;
         });
 
         $order = Order::findOrFail($id);
 
+        CancelAbandonedOrder::dispatch($order)
+                        ->delay(now()->addMinutes(10));
+
         return response()->json($order, Response::HTTP_CREATED);
     }
 
     public function read(Request $request, $id): JsonResponse
     {
-        $order = Order::with('products')->findOrFail($id);
+        $order = Order::findOrFail($id);
 
         if ($request->user()->id !== $order->user_id) {
             return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
@@ -70,6 +78,13 @@ class OrderController extends Controller
 
         if ($request->user()->id !== $order->user_id) {
             return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($order->status === Order::STATUS_CANCELLED) {
+            return response()->json([
+                'message' => 'Order already cancelled'],
+                Response::HTTP_BAD_REQUEST
+            );
         }
 
        if ($order->status != Order::STATUS_PENDING) {
@@ -91,6 +106,13 @@ class OrderController extends Controller
         // TODO: check whether the user owns the order
         if ($request->user()->id !== $order->user_id) {
             return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($order->status != Order::STATUS_PENDING) {
+            return response()->json([
+                'message' => 'Only pending orders can get paid'],
+                Response::HTTP_BAD_REQUEST
+            );
         }
 
         // if ($order->status != Order::STATUS_UNPAID) {

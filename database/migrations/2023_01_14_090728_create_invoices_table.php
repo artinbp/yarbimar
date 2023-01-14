@@ -13,12 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('invoices', function (Blueprint $table) {
             $table->increments('id');
-            $table->decimal('amount');
-            $table->string('provider');
-            $table->enum('status', ['unpaid', 'paid'])->default('unpaid');
-            $table->bigInteger('transaction_id');
+
+            $table->integer('user_id')->unsigned();
+            $table->date('invoice_date');
+            $table->string('invoice_number');
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
@@ -30,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('invoices');
     }
 };

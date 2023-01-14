@@ -13,12 +13,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('invoice_item', function (Blueprint $table) {
             $table->increments('id');
+
+            $table->integer('invoice_id')->unsigned()->nullable()->default(null);
+            $table->integer('quantity');
+            $table->decimal('price');
             $table->decimal('amount');
-            $table->string('provider');
-            $table->enum('status', ['unpaid', 'paid'])->default('unpaid');
-            $table->bigInteger('transaction_id');
+            $table->text('description')->nullable()->default(null);
+
+            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
@@ -30,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('invoice_item');
     }
 };

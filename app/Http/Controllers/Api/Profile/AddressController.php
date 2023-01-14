@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Profile\Address\CreateAddressRequest;
+use App\Http\Requests\Api\Profile\Address\UpdateAddressRequest;
 use App\Models\Address;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,25 +23,17 @@ class AddressController extends Controller
         return response()->json($address, Response::HTTP_OK);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(CreateAddressRequest $request): JsonResponse
     {
-        $fields = $request->validate([
-            'address' => ['required', 'filled', 'string'],
-            'state' => ['required', 'filled', 'string'],
-            'city' => ['required', 'filled', 'string'],
-            'building_number' => ['required', 'filled', 'numeric'],
-            'unit_number' => ['filled', 'numeric'],
-            'zip_code' => ['required', 'filled', 'string'],
-            'receiver_first_name' => ['required', 'filled', 'string'],
-            'receiver_last_name' => ['required', 'filled', 'string'],
-            'receiver_phone' => ['required', 'filled', 'string'],
-        ]);
+        $fields = $request->validated();
 
-        $address = [];
-        DB::transaction(function () use ($fields, $request, &$address) {
+        $id = 0;
+        DB::transaction(function () use ($fields, $request, &$id) {
             $address = Address::create($fields);
+            $id = $address->id;
             $request->user()->address()->save($address);
         });
+        $address = Address::findOrFail($id);
 
         return response()->json($address, Response::HTTP_CREATED);
     }
@@ -52,22 +46,12 @@ class AddressController extends Controller
         return response()->json($address, Response::HTTP_OK);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(UpdateAddressRequest $request, $id): JsonResponse
     {
         $address = Address::where('user_id', '=', $request->user()->id)
             ->where('id', '=', $id)->firstOrFail();
 
-        $fields = $request->validate([
-            'address' => ['filled', 'string'],
-            'state' => ['filled', 'string'],
-            'city' => ['filled', 'string'],
-            'building_number' => ['filled', 'numeric'],
-            'unit_number' => ['filled', 'numeric'],
-            'zip_code' => ['filled', 'numeric'],
-            'receiver_first_name' => ['filled', 'string'],
-            'receiver_last_name' => ['filled', 'string'],
-            'receiver_phone' => ['filled'],
-        ]);
+        $fields = $request->validated();
 
         $address->update($fields);
         $address = Address::where('user_id', '=', $request->user()->id)
