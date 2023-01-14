@@ -12,14 +12,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DeliveryController extends Controller
 {
-    public function index(): JsonResponse
+    private const DELIVERY_PER_PAGE = 8;
+
+    public function list(): JsonResponse
     {
-        $deliveries = Delivery::all();
+        $deliveries = Delivery::paginate(self::DELIVERY_PER_PAGE);
 
         return response()->json($deliveries, Response::HTTP_OK);
     }
 
-    public function create(CreateDeliveryRequest $request)
+    public function create(CreateDeliveryRequest $request): JsonResponse
     {
         $delivery = Delivery::create($request->validated());
 

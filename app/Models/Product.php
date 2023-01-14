@@ -19,17 +19,16 @@ class Product extends Model
         'title',
         'description',
         'price',
-        'discount',
         'thumbnail_path',
-        //'media',
         'stock',
     ];
 
-    protected $with = ['media', 'categories'];
+    protected $with = [
+        'media',
+        'categories',
+    ];
 
-    protected $appends = ['thumbnail_url', 'selling_price'];
-
-    protected $casts = ['selling_price' => 'decimal'];
+    protected $appends = ['thumbnail_url'];
 
     public function categories(): BelongsToMany
     {
@@ -65,18 +64,10 @@ class Product extends Model
             }
         }
 
-        if ($request->has('have_discount') && $request->input('have_discount') == true) {
-            $builder->where('discount', '!=', 0);
-        }
-
         return $builder;
     }
 
     public function getThumbnailUrlAttribute() {
         return Storage::url($this->thumbnail_path);
-    }
-
-    public function getSellingPriceAttribute() {
-        return number_format($this->price - ($this->price * ($this->discount / 100)), 2, '.', '');
     }
 }

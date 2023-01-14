@@ -27,7 +27,7 @@ class CreateDeliveryRequest extends FormRequest
             'name' => ['required', 'filled', 'string'],
             'description' => ['required', 'filled', 'string'],
             'fee' => ['required', 'filled', 'numeric'],
-            'boolean' => ['filled', 'boolean'],
+            'disabled' => ['filled', 'boolean'],
         ];
     }
 }

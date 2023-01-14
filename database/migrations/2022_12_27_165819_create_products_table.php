@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->decimal('price')->unsigned();
-            $table->decimal('discount')->unsigned()->default(0);
             $table->integer('stock')->unsigned();
             $table->text('thumbnail_path');
             $table->timestamps();

@@ -28,7 +28,6 @@ class CreateProductRequest extends FormRequest
             'description' => ['required', 'filled', 'string'],
             'categories.*' => ['required', 'filled', 'numeric', 'distinct', 'exists:categories,id'],
             'price' => ['required', 'filled', 'numeric'],
-            'discount' => ['filled', 'numeric', 'min:0', 'max:100'],
             'media.*' => ['filled', 'numeric', 'distinct', 'exists:media,id'],
             'thumbnail_path' => ['required', 'filled', 'string', 'exists:media,path'],
             'stock' => ['required', 'filled', 'numeric'],

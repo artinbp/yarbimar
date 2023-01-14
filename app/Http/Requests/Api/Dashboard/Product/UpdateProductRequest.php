@@ -28,7 +28,6 @@ class UpdateProductRequest extends FormRequest
             'description' => ['filled', 'string'],
             'categories.*' => ['filled', 'numeric', 'distinct', 'exists:categories,id'],
             'price' => ['filled', 'numeric'],
-            'discount' => ['filled', 'numeric', 'min:0', 'max:100'],
             'media.*' => ['filled', 'distinct', 'exists:media,id'],
             'thumbnail_path' => ['filled', 'string', 'exists:media,path'],
             'stock' => ['filled', 'numeric'],

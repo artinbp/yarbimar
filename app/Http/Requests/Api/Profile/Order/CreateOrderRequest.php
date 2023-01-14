@@ -26,7 +26,9 @@ class CreateOrderRequest extends FormRequest
         return [
             'products.*' => ['required', 'filled', 'array'],
             'products.*.id' => ['required', 'filled', 'numeric', 'distinct', 'exists:products,id'],
-            'products.*.quantity' => ['required', 'filled', 'numeric']
+            'products.*.quantity' => ['required', 'filled', 'numeric'],
+//            'address_id' => ['required', 'filled', 'numeric', 'exists:addresses,id'],
+//            'delivery_id' => ['required', 'filled', 'numeric', 'exists:delivery_methods,id'],
         ];
     }
 }

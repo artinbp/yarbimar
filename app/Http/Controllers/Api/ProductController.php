@@ -16,7 +16,9 @@ class ProductController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $products = Product::filter($request)->paginate(self::PRODUCT_PER_PAGE);
+        $products = Product::filter($request)
+            ->whereRelation('categories', 'disabled', '=', false)
+            ->paginate(self::PRODUCT_PER_PAGE);
 
         return response()->json($products, Response::HTTP_OK);
     }

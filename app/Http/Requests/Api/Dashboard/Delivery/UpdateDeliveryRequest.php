@@ -27,7 +27,7 @@ class UpdateDeliveryRequest extends FormRequest
             'name' => ['filled', 'string'],
             'description' => ['filled', 'string'],
             'fee' => ['filled', 'numeric'],
-            'boolean' => ['filled', 'boolean'],
+            'disabled' => ['filled', 'boolean'],
         ];
     }
 }

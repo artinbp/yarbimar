@@ -29,26 +29,20 @@ class OrderController extends Controller
     {
         $fields = $request->validated();
 
-        $products = Product::findOrFail($fields['products']);
+        $productQty = collect($fields['products'])->pluck('quantity', 'id');
+        $orderLine = [];
+        Product::findOrFail($productQty->keys())->map(function($product) use(&$orderLine, $productQty) {
+            $orderLine[$product->id] = [
+                'quantity' => $productQty[$product->id],
+                'price' => $product->price,
+            ];
+        });
 
-        $total = 0;
-        foreach ($products as $product) {
-            $total += $product->selling_price;
-        }
+        $id = 0;
+        DB::transaction(function() use($orderLine, $request, &$id) {
+            $order = Order::create(['status'  => Order::STATUS_PENDING]);
 
-        $id = "";
-        DB::transaction(function() use($request, $fields, $total, &$id) {
-            $order = Order::create([
-                'total'   => $total,
-                'status'  => Order::STATUS_PENDING,
-            ]);
-
-            $productsWithQuantity = [];
-            foreach ($fields['products'] as $product) {
-                $productsWithQuantity[] = [$product['id'] => $product['quantity']];
-            }
-
-            $order->products()->attach($productsWithQuantity);
+            $order->products()->attach($orderLine);
             $request->user()->orders()->save($order);
             $id = $order->id;
         });
@@ -56,7 +50,7 @@ class OrderController extends Controller
         $order = Order::findOrFail($id);
 
         CancelAbandonedOrder::dispatch($order)
-                        ->delay(now()->addMinutes(10));
+                        ->delay(now()->addMinutes(15));
 
         return response()->json($order, Response::HTTP_CREATED);
     }
