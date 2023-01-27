@@ -20,7 +20,7 @@ class UserController extends Controller
 
     public function list(): JsonResponse
     {
-        $users = User::paginate(self::USERS_PER_PAGE);
+        $users = User::latest()->paginate(self::USERS_PER_PAGE);
 
         return response()->json($users, Response::HTTP_OK);
     }

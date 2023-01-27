@@ -18,6 +18,7 @@ class ProductController extends Controller
     {
         $products = Product::filter($request)
             ->whereRelation('categories', 'disabled', '=', false)
+            ->latest()
             ->paginate(self::PRODUCT_PER_PAGE);
 
         return response()->json($products, Response::HTTP_OK);

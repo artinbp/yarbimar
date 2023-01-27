@@ -24,7 +24,6 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'products'   => ['array'],
             'products.*' => ['filled', 'numeric', 'distinct', 'exists:products,id'],
             'status'     => ['filled', 'string', 'in:pending,processing,completed,cancelled'],
             'user_id'    => ['filled', 'numeric', 'exists:users,id'],

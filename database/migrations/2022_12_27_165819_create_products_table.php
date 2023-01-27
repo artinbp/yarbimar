@@ -20,6 +20,14 @@ return new class extends Migration
             $table->decimal('price')->unsigned();
             $table->integer('stock')->unsigned();
             $table->text('thumbnail_path');
+            $table->string('color');
+            $table->decimal('size');
+            $table->string('brand');
+            $table->string('manufacturing_country');
+            $table->decimal('weight');
+            $table->decimal('length');
+            $table->decimal('breadth');
+            $table->decimal('width');
             $table->timestamps();
 
             $table->fullText(['title', 'description']);

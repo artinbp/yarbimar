@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\Dashboard\ProductController as DashboardProductCont
 use App\Http\Controllers\Api\Dashboard\RoleController as DashboardRoleController;
 use App\Http\Controllers\Api\Dashboard\UserController as DashboardUserController;
 use App\Http\Controllers\Api\Dashboard\DeliveryController as DashboardDeliveryController;
-use App\Http\Controllers\Api\DeliveryController;
+use App\Http\Controllers\Api\ShippingMethodController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\Profile\AddressController;
 use App\Http\Controllers\Api\Profile\OrderController;
@@ -92,7 +92,8 @@ Route::get('/v1/profile/orders/{id}', [OrderController::class, 'read'])->middlew
 Route::get('/v1/profile/orders/{id}/cancel', [OrderController::class, 'cancel'])->middleware('auth:sanctum');
 Route::get('/v1/profile/orders/{id}/purchase', [OrderController::class, 'purchase'])->middleware('auth:sanctum');
 
-Route::get('/v1/deliveries', [DeliveryController::class, 'list'])->middleware('auth:sanctum');
+Route::get('/v1/shipping_methods', [ShippingMethodController::class, 'list'])->middleware('auth:sanctum');
+Route::post('/v1/orders/cost', [OrderController::class, 'cost'])->middleware('auth:sanctum');
 
 // ---------- Public Routes ----------
 

@@ -18,7 +18,7 @@ class OrderController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $orders = Order::filter($request)->paginate(self::ORDER_PER_PAGE);
+        $orders = Order::filter($request)->latest()->paginate(self::ORDER_PER_PAGE);
 
         return response()->json($orders, Response::HTTP_OK);
     }

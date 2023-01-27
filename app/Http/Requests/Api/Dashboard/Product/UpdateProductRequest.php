@@ -31,6 +31,14 @@ class UpdateProductRequest extends FormRequest
             'media.*' => ['filled', 'distinct', 'exists:media,id'],
             'thumbnail_path' => ['filled', 'string', 'exists:media,path'],
             'stock' => ['filled', 'numeric'],
+            'color' => ['filled', 'string'],
+            'size' => ['filled', 'numeric'],
+            'brand' => ['filled', 'string'],
+            'manufacturing_country' => ['filled', 'string'],
+            'weight' => ['filled', 'numeric'],
+            'length' => ['filled', 'numeric'],
+            'breadth' => ['filled', 'numeric'],
+            'width' => ['filled', 'numeric'],
         ];
     }
 }

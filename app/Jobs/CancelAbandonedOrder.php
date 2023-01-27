@@ -48,6 +48,12 @@ class CancelAbandonedOrder implements ShouldQueue
 
             if ($order->status === Order::STATUS_PENDING) {
                 $order->update(['status' => Order::STATUS_CANCELLED]);
+                // TODO: plush stock.
+
+                foreach ($order->products as $product) {
+                    $product->stock = $product->stock + $product->pivot->quantity;
+                    $product->save();
+                }
             }
         });
     }

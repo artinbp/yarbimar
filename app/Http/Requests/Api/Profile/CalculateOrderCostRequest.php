@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Requests\Api\Profile\Order;
+namespace App\Http\Requests\Api\Profile;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateOrderRequest extends FormRequest
+class CalculateOrderCostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -26,12 +26,12 @@ class CreateOrderRequest extends FormRequest
         return [
             'products' => ['array'],
             'products.*' => ['required', 'filled', 'distinct', function($attribute, $value, $fail) {
-                if (!is_numeric((int) $value)) {
+                if (!is_numeric($value)) {
                     $fail('The product id should be numeric.');
                 }
             }],
-            'products.*.quantity' => ['required', 'filled', 'numeric', 'gt:0'],
-            'products.*.price'    => ['required', 'filled', 'numeric', 'gt:0'],
+            'products.*.quantity' => ['required', 'filled', 'numeric'],
+            'products.*.price'    => ['required', 'filled', 'numeric'],
             'address_id' => ['required', 'filled', 'numeric', 'exists:addresses,id'],
             'shipping_method_id' => ['required', 'filled', 'numeric', 'exists:shipping_methods,id'],
         ];

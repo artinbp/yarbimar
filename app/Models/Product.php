@@ -21,6 +21,14 @@ class Product extends Model
         'price',
         'thumbnail_path',
         'stock',
+        'color',
+        'size',
+        'brand',
+        'manufacturing_country',
+        'weight',
+        'length',
+        'breadth',
+        'width',
     ];
 
     protected $with = [

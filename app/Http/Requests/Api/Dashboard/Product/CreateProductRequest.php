@@ -27,10 +27,18 @@ class CreateProductRequest extends FormRequest
             'title' => ['required', 'filled', 'string'],
             'description' => ['required', 'filled', 'string'],
             'categories.*' => ['required', 'filled', 'numeric', 'distinct', 'exists:categories,id'],
-            'price' => ['required', 'filled', 'numeric'],
+            'price' => ['required', 'filled', 'numeric', 'gt:0'],
             'media.*' => ['filled', 'numeric', 'distinct', 'exists:media,id'],
             'thumbnail_path' => ['required', 'filled', 'string', 'exists:media,path'],
             'stock' => ['required', 'filled', 'numeric'],
+            'color' => ['required', 'filled', 'string'],
+            'size' => ['required', 'filled', 'numeric'],
+            'brand' => ['required', 'filled', 'string'],
+            'manufacturing_country' => ['required', 'filled', 'string'],
+            'weight' => ['required', 'filled', 'numeric'],
+            'length' => ['required', 'filled', 'numeric'],
+            'breadth' => ['required', 'filled', 'numeric'],
+            'width' => ['required', 'filled', 'numeric'],
         ];
     }
 }

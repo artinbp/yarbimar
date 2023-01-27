@@ -16,7 +16,7 @@ class MediaController extends Controller
 
     public function list(): JsonResponse
     {
-        $media = Media::paginate(self::MEDIA_PER_PAGE);
+        $media = Media::latest()->paginate(self::MEDIA_PER_PAGE);
 
         return response()->json($media, Response::HTTP_OK);
     }

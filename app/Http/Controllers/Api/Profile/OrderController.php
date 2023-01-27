@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Profile;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Profile\Order\CreateOrderRequest;
 use App\Jobs\CancelAbandonedOrder;
+use App\Models\Address;
+use App\Models\Shipping;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +22,7 @@ class OrderController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $orders = Order::filter($request)->paginate(self::ORDER_PER_PAGE);
+        $orders = Order::filter($request)->latest()->paginate(self::ORDER_PER_PAGE);
 
         return response()->json($orders, Response::HTTP_OK);
     }
@@ -29,30 +31,68 @@ class OrderController extends Controller
     {
         $fields = $request->validated();
 
-        $productQty = collect($fields['products'])->pluck('quantity', 'id');
+        $products = Product::findOrFail(array_map('intval', array_keys($fields['products'])))->keyBy('id');
+        $address = Address::findOrFail($fields['address_id']);
+        $shipping = Shipping::findOrFail($fields['shipping_method_id']);
+
+        $errors = [];
+        foreach ($fields['products'] as $productID => $productFields) {
+            if ($products[$productID]->stock < $productFields['quantity']) {
+                $errors[] = [
+                    'product_id' => $productID,
+                    'type'       => 'quantity_mismatch',
+                    'message'    => 'Sorry, we have only ' . $productID[$productID]->stock . ' of ' . $productFields['quantity'] . ' available stock',
+                ];
+            }
+
+            if ($products[$productID]->price != $productFields['price']) {
+                $errors[] = [
+                    'product_id' => $productID,
+                    'type'       => 'price_change',
+                    'message'    => 'Sorry, the price of ' . $products[$productID]->title . ' has changed. Try to order with new price.',
+                ];
+            }
+        }
+
+        if (count($errors) != 0) {
+            return response()->json(['errors' => $errors], Response::HTTP_CONFLICT);
+        }
+
         $orderLine = [];
-        Product::findOrFail($productQty->keys())->map(function($product) use(&$orderLine, $productQty) {
+        foreach ($products as $product) {
             $orderLine[$product->id] = [
-                'quantity' => $productQty[$product->id],
-                'price' => $product->price,
+                'quantity' => $fields['products'][$product->id]['quantity'],
+                'price'    => $product->price,
             ];
-        });
+        }
 
         $id = 0;
-        DB::transaction(function() use($orderLine, $request, &$id) {
+        DB::transaction(function() use($orderLine, $request, $products, $address, $shipping, $fields, &$id) {
             $order = Order::create(['status'  => Order::STATUS_PENDING]);
+
+            foreach ($products as $product) {
+                $product->stock = $product->stock - $fields['products'][$product->id]['quantity'];
+                $product->save();
+            }
 
             $order->products()->attach($orderLine);
             $request->user()->orders()->save($order);
+            $address->orders()->save($order);
+            $shipping->orders()->save($order);
             $id = $order->id;
         });
 
         $order = Order::findOrFail($id);
 
         CancelAbandonedOrder::dispatch($order)
-                        ->delay(now()->addMinutes(15));
+                        ->delay(now()->addMinutes(1));
 
         return response()->json($order, Response::HTTP_CREATED);
+    }
+
+    public function cost(Request $request): JsonResponse
+    {
+
     }
 
     public function read(Request $request, $id): JsonResponse
@@ -91,45 +131,5 @@ class OrderController extends Controller
         $order->update(['status' => Order::STATUS_CANCELLED]);
 
         return response()->json(['message' => 'Order cancelled']);
-    }
-
-    public function purchase(Request $request, $id): JsonResponse
-    {
-         $order = Order::findOrFail($id);
-
-        // TODO: check whether the user owns the order
-        if ($request->user()->id !== $order->user_id) {
-            return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
-        }
-
-        if ($order->status != Order::STATUS_PENDING) {
-            return response()->json([
-                'message' => 'Only pending orders can get paid'],
-                Response::HTTP_BAD_REQUEST
-            );
-        }
-
-        // if ($order->status != Order::STATUS_UNPAID) {
-        //     return response()->json([
-        //         'message' => 'Order may already paid or got cancelled'],
-        //         Response::HTTP_BAD_REQUEST
-        //     );
-        // }
-
-        // $invoice = (new Invoice)->amount($order->total);
-
-        // $ti = 0;
-        // $response = Payment::purchase(
-        //     (new Invoice)->amount(1000),
-        //     function($driver, $transactionId) {
-        //         // Store transactionId in database.
-        //         // We need the transactionId to verify payment in the future.
-        //         Payment::create([
-        //             'amount' => $order->total,
-        //             'provider' => 'dd',
-        //             'status'   => Payment::STATUS_UNPAID,
-        //         ]);
-        //     }
-        // )->pay()->toJson();
     }
 }
