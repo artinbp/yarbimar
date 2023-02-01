@@ -22,7 +22,7 @@ class CreateDiseaseRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules(): bool
+    public function rules(): array
     {
         return [
             'name' => ['required', 'filled', 'string', 'unique:diseases,name']

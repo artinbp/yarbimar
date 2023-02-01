@@ -37,12 +37,12 @@ class DiseaseController extends Controller
         return response()->json($disease, Response::HTTP_OK);
     }
 
-    public function update(UpdateDiseaseRequest $request): JsonResponse
+    public function update($id, UpdateDiseaseRequest $request): JsonResponse
     {
         $fields = $request->validated();
 
-        $disease = Disease::findOrFail($fields);
-        $disease->update($disease);
+        $disease = Disease::findOrFail($id);
+        $disease->update($fields);
         $disease = $disease->fresh();
 
         return response()->json($disease, Response::HTTP_OK);

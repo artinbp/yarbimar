@@ -63,7 +63,7 @@ Route::delete('/v1/dashboard/shipping_methods/{id}', [DashboardShippingMethodCon
 
 Route::get('/v1/dashboard/diseases', [DashboardDiseaseController::class, 'list'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::post('/v1/dashboard/diseases', [DashboardDiseaseController::class, 'create'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
-Route::post('/v1/dashboard/diseases/{id}', [DashboardDiseaseController::class, 'read'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::get('/v1/dashboard/diseases/{id}', [DashboardDiseaseController::class, 'read'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::patch('/v1/dashboard/diseases/{id}', [DashboardDiseaseController::class, 'update'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::delete('/v1/dashboard/diseases/{id}', [DashboardDiseaseController::class, 'delete'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 
