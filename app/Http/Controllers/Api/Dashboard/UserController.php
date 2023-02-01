@@ -74,10 +74,18 @@ class UserController extends Controller
             }
         }
 
-        DB::transaction(function () use ($id, $fields, &$user, $role) {
+        DB::transaction(function () use ($id, $fields, &$user, $role, $request) {
             if (isset($fields['password']) && !empty($fields['password'])) {
                 $fields['password'] = bcrypt($fields['password']);
-                $user->tokens()->delete();
+                // TODO: check if the user changing its own password.
+//                foreach ($user->tokens() as $token) {
+//                    if ($token == $request->user()->currentAccessToken()) {
+//                        continue;
+//                    }
+//                    $token->delete();
+//                }
+
+                // $user->tokens()->delete();
             }
 
             $user->update($fields);
