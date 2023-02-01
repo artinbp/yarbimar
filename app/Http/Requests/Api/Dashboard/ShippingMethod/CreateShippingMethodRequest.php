@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Api\Dashboard\Shipping;
+namespace App\Http\Requests\Api\Dashboard\ShippingMethod;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateShippingRequest extends FormRequest
+class CreateShippingMethodRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class UpdateShippingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['filled', 'string'],
-            'description' => ['filled', 'string'],
-            'fee' => ['filled', 'numeric'],
+            'name' => ['required', 'filled', 'string'],
+            'description' => ['required', 'filled', 'string'],
+            'fee' => ['required', 'filled', 'numeric'],
             'disabled' => ['filled', 'boolean'],
         ];
     }

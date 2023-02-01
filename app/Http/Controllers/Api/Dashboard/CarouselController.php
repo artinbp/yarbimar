@@ -31,18 +31,17 @@ class CarouselController extends Controller
         $count = Carousel::count();
         if ($count >= self::MAX_CAROUSEL) {
             return response()->json([
-                'message' => 'You can\'t create carousel more than ' . self::MAX_CAROUSEL
+                'message' => 'You can\'t create more than ' . self::MAX_CAROUSEL . ' carousel'
             ], Response::HTTP_FORBIDDEN);
         }
 
         $media = Media::findOrFail($fields['media_id']);
-        $id = 0;
-        DB::transaction(function () use ($fields, $media, &$id) {
+        $carousel = null;
+        DB::transaction(function () use ($fields, $media, &$carousel) {
             $carousel = Carousel::create($fields);
-            $id = $carousel->id;
             $media->carousel()->save($carousel);
+            $carousel = $carousel->fresh();
         });
-        $carousel = Carousel::findOrFail($id);
 
         return response()->json($carousel, Response::HTTP_CREATED);
     }
@@ -57,19 +56,18 @@ class CarouselController extends Controller
     public function update(UpdateCarouselRequest $request, $id): JsonResponse
     {
         $carousel = Carousel::findOrFail($id);
-
         $fields = $request->validated();
 
-        DB::transaction(function () use ($carousel, $fields) {
+        DB::transaction(function () use (&$carousel, $fields) {
             $carousel->update($fields);
 
             if (isset($fields['media_id']) && !empty($fields['media_id'])) {
                 $media = Media::findOrFail($fields['media_id']);
                 $media->carousel()->save($carousel);
             }
-        });
 
-        $carousel = Carousel::findOrFail($id);
+            $carousel = $carousel->fresh();
+        });
 
         return response()->json($carousel, Response::HTTP_OK);
     }

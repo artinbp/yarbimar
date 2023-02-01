@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CarouselController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\Dashboard\CarouselController as DashboardCarouselController;
 use App\Http\Controllers\Api\Dashboard\CategoryController as DashboardCategoryController;
@@ -10,7 +11,9 @@ use App\Http\Controllers\Api\Dashboard\OrderController as DashboardOrderControll
 use App\Http\Controllers\Api\Dashboard\ProductController as DashboardProductController;
 use App\Http\Controllers\Api\Dashboard\RoleController as DashboardRoleController;
 use App\Http\Controllers\Api\Dashboard\UserController as DashboardUserController;
-use App\Http\Controllers\Api\Dashboard\DeliveryController as DashboardDeliveryController;
+use App\Http\Controllers\Api\Dashboard\ShippingMethodController as DashboardDeliveryController;
+use App\Http\Controllers\Api\Dashboard\UserAddressController as DashboardUserAddressController;
+use App\Http\Controllers\Api\Dashboard\ShippingMethodController as DashboardShippingMethodController;
 use App\Http\Controllers\Api\ShippingMethodController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\Profile\AddressController;
@@ -45,6 +48,18 @@ Route::post('/v1/dashboard/users', [DashboardUserController::class, 'create'])->
 Route::get('/v1/dashboard/users/{id}', [DashboardUserController::class, 'read'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::patch('/v1/dashboard/users/{id}', [DashboardUserController::class, 'update'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::delete('/v1/dashboard/users/{id}', [DashboardUserController::class, 'delete'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+
+Route::get('/v1/dashboard/users/{user}/addresses', [DashboardUserAddressController::class, 'list'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::post('/v1/dashboard/users/{user}/addresses', [DashboardUserAddressController::class, 'create'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::get('/v1/dashboard/users/{user}/addresses/{address}', [DashboardUserAddressController::class, 'read'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::patch('/v1/dashboard/users/{user}/addresses/{address}', [DashboardUserAddressController::class, 'update'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::delete('/v1/dashboard/users/{user}/addresses/{address}', [DashboardUserAddressController::class, 'delete'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+
+Route::get('/v1/dashboard/shipping_methods', [DashboardShippingMethodController::class, 'list']);
+Route::post('/v1/dashboard/shipping_methods', [DashboardShippingMethodController::class, 'create']);
+Route::get('/v1/dashboard/shipping_methods/{id}', [DashboardShippingMethodController::class, 'read']);
+Route::patch('/v1/dashboard/shipping_methods/{id}', [DashboardShippingMethodController::class, 'update']);
+Route::delete('/v1/dashboard/shipping_methods/{id}', [DashboardShippingMethodController::class, 'delete']);
 
 Route::get('/v1/dashboard/media', [DashboardMediaController::class, 'list'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::post('/v1/dashboard/media', [DashboardMediaController::class, 'create'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
@@ -94,6 +109,10 @@ Route::get('/v1/profile/orders/{id}/purchase', [OrderController::class, 'purchas
 
 Route::get('/v1/shipping_methods', [ShippingMethodController::class, 'list'])->middleware('auth:sanctum');
 Route::post('/v1/orders/cost', [OrderController::class, 'cost'])->middleware('auth:sanctum');
+
+Route::get('/v1/cart', [CartController::class, 'list'])->middleware('auth:sanctum');
+Route::post('v1/cart/add', [CartController::class, 'add'])->middleware('auth:sanctum');
+Route::post('/v1/cart/remove', [CartController::class, 'remove'])->middleware('auth:sanctum');
 
 // ---------- Public Routes ----------
 

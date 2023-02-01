@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Profile\Order\CreateOrderRequest;
 use App\Jobs\CancelAbandonedOrder;
 use App\Models\Address;
-use App\Models\Shipping;
+use App\Models\ShippingMethod;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -22,7 +22,10 @@ class OrderController extends Controller
 
     public function list(Request $request): JsonResponse
     {
-        $orders = Order::filter($request)->latest()->paginate(self::ORDER_PER_PAGE);
+        $orders = Order::where('user_id', '=', $request->user()->id)
+            ->filter($request)
+            ->latest()
+            ->paginate(self::ORDER_PER_PAGE);
 
         return response()->json($orders, Response::HTTP_OK);
     }
@@ -33,7 +36,7 @@ class OrderController extends Controller
 
         $products = Product::findOrFail(array_map('intval', array_keys($fields['products'])))->keyBy('id');
         $address = Address::findOrFail($fields['address_id']);
-        $shipping = Shipping::findOrFail($fields['shipping_method_id']);
+        $shipping = ShippingMethod::findOrFail($fields['shipping_method_id']);
 
         $errors = [];
         foreach ($fields['products'] as $productID => $productFields) {
@@ -92,7 +95,34 @@ class OrderController extends Controller
 
     public function cost(Request $request): JsonResponse
     {
+        $fields = $request->validated();
 
+        $products = Product::findOrFail(array_map('intval', array_keys($fields['products'])))->keyBy('id');
+        $address = Address::findOrFail($fields['address_id']);
+        $shipping = ShippingMethod::findOrFail($fields['shipping_method_id']);
+
+        $errors = [];
+        foreach ($fields['products'] as $productID => $productFields) {
+            if ($products[$productID]->stock < $productFields['quantity']) {
+                $errors[] = [
+                    'product_id' => $productID,
+                    'type'       => 'quantity_mismatch',
+                    'message'    => 'Sorry, we have only ' . $productID[$productID]->stock . ' of ' . $productFields['quantity'] . ' available stock',
+                ];
+            }
+
+            if ($products[$productID]->price != $productFields['price']) {
+                $errors[] = [
+                    'product_id' => $productID,
+                    'type'       => 'price_change',
+                    'message'    => 'Sorry, the price of ' . $products[$productID]->title . ' has changed. Try to order with new price.',
+                ];
+            }
+        }
+
+        if (count($errors) != 0) {
+            return response()->json(['errors' => $errors], Response::HTTP_CONFLICT);
+        }
     }
 
     public function read(Request $request, $id): JsonResponse

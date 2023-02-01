@@ -2,10 +2,12 @@
 
 namespace App\Exceptions;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Auth\AuthenticationException;
+use \Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\RecordsNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -46,15 +48,21 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (ModelNotFoundException $e, $request) {
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'Item Not Found'], Response::HTTP_NOT_FOUND);
+            }
         });
 
-        $this->renderable(function (ModelNotFoundException $e, $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Record not found.'
-                ], Response::HTTP_NOT_FOUND);
+//        $this->renderable(function (NotFoundHttpException $e, $request) {
+//            if ($request->wantsJson() || $request->is('api/*')) {
+//                return response()->json(['message' => 'The requested link or item does not exist'], Response::HTTP_NOT_FOUND);
+//            }
+//        });
+
+        $this->renderable(function (AuthenticationException $e, $request) {
+            if ($request->wantsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'unauthenticated'], 401);
             }
         });
     }

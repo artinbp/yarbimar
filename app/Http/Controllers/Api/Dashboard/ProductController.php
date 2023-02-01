@@ -51,11 +51,11 @@ class ProductController extends Controller
         $fields = $request->validated();
 
         $product = Product::findOrFail($id);
-        DB::transaction(function () use (&$product, $fields) {
+        DB::transaction(function () use ($product, $fields) {
             $product->update($fields);
             $product->media()->sync($fields['media']);
         });
-        $product = Product::findOrFail($id);
+        $product = $product->fresh();
 
         return response()->json($product, Response::HTTP_OK);
     }

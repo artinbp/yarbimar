@@ -8,6 +8,7 @@ use App\Models\Category;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -77,5 +78,10 @@ class Product extends Model
 
     public function getThumbnailUrlAttribute() {
         return Storage::url($this->thumbnail_path);
+    }
+
+    public function cartItems(): HasMany
+    {
+        return $this->HasMany(CartItem::class);
     }
 }

@@ -33,7 +33,6 @@ class OrderController extends Controller
     public function update(UpdateUserRequest $request, $id): JsonResponse
     {
         $order = Order::findOrFail($id);
-
         $fields = $request->validated();
 
         $products = Product::findOrFail($fields['products']);
@@ -52,8 +51,7 @@ class OrderController extends Controller
             $order->products()->sync($fields['products']);
             $user->orders()->save($order);
         });
-
-        $order = Order::findOrFail($id);
+        $order = $order->fresh();
 
         return response()->json($order, Response::HTTP_OK);
     }

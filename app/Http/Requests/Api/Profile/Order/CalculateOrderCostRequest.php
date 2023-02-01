@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Profile;
+namespace App\Http\Requests\Api\Profile\Order;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -13,7 +13,7 @@ class CalculateOrderCostRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Dashboard\Media\CreateMediaRequest;
 use App\Models\Media;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use function response;
@@ -56,9 +57,11 @@ class MediaController extends Controller
     public function delete($id): JsonResponse
     {
         $media = Media::findOrFail($id);
-        $media->delete();
 
-        Storage::disk('public')->delete($media->path);
+        DB::transaction(function() use($media) {
+            $media->delete();
+            Storage::disk('public')->delete($media->path);
+        });
 
         return response()->json(['message' => 'Media successfully deleted'], Response::HTTP_OK);
     }

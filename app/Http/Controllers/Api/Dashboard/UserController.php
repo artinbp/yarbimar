@@ -37,17 +37,17 @@ class UserController extends Controller
         }
 
         $fields['password'] = bcrypt($fields['password']);
-        $id = 0;
-        DB::transaction(function () use ($fields, $role, &$id) {
+        $user = null;
+        DB::transaction(function () use ($fields, &$user, $role) {
             $user = User::create($fields);
-            $id = $user->id;
             $role->users()->save($user);
 
             if (isset($fields['addresses']) && !empty($fields['addresses'])) {
                 $user->address()->createMany($fields['addresses']);
             }
+
+            $user = $user->fresh();
         });
-        $user = User::findOrFail($id);
 
         return response()->json($user, Response::HTTP_CREATED);
     }
@@ -62,7 +62,6 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
-
         $fields = $request->validated();
 
         $role = Role::findOrFail($fields['role']);
@@ -83,16 +82,22 @@ class UserController extends Controller
             if (isset($fields['role']) && !empty($fields['role'])) {
                 $role->users()->save($user);
             }
-        });
 
-        $user = User::findOrFail($id);
+            $user = $user->fresh();
+        });
 
         return response()->json($user, Response::HTTP_OK);
     }
 
-    public function delete($id): JsonResponse
+    public function delete(Request $request, $id): JsonResponse
     {
         $user = User::findOrFail($id);
+        if ($user->id == $request->user()->id) {
+            return response()->json([
+                'message' => 'A user can not delete itself'
+            ], Response::HTTP_UNAUTHORIZED);
+        }
+
         if ($user->hasRole(Role::ROLE_SUPER_ADMIN)) {
             return response()->json([
                 'message' => 'User with super admin role can not be deleted'

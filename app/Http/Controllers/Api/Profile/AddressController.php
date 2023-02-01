@@ -27,13 +27,12 @@ class AddressController extends Controller
     {
         $fields = $request->validated();
 
-        $id = 0;
-        DB::transaction(function () use ($fields, $request, &$id) {
+        $address = null;
+        DB::transaction(function () use ($fields, $request, &$address) {
             $address = Address::create($fields);
-            $id = $address->id;
             $request->user()->address()->save($address);
+            $address = $address->fresh();
         });
-        $address = Address::findOrFail($id);
 
         return response()->json($address, Response::HTTP_CREATED);
     }
