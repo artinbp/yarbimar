@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Dashboard\Disease;
 
+use App\Models\Disease;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateDiseaseRequest extends FormRequest
@@ -24,7 +25,7 @@ class CreateDiseaseRequest extends FormRequest
     public function rules(): bool
     {
         return [
-            'name' => ['required', '']
+            'name' => ['required', 'filled', 'string', 'unique:diseases,name']
         ];
     }
 }

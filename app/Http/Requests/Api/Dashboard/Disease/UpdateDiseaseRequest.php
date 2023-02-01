@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Dashboard\Disease;
 
+use App\Models\Disease;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateDiseaseRequest extends FormRequest
@@ -23,8 +24,10 @@ class UpdateDiseaseRequest extends FormRequest
      */
     public function rules()
     {
+        $disease = Disease::findOrFail($this->route('id'));
+
         return [
-            //
+            'name' => ['required', 'filled', 'string', 'unique:diseases,name,'.$disease->id]
         ];
     }
 }
