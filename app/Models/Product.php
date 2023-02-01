@@ -35,6 +35,7 @@ class Product extends Model
     protected $with = [
         'media',
         'categories',
+        'diseases'
     ];
 
     protected $appends = ['thumbnail_url'];
@@ -47,6 +48,11 @@ class Product extends Model
     public function media(): BelongsToMany
     {
         return $this->belongsToMany(Media::class);
+    }
+
+    public function diseases(): BelongsToMany
+    {
+        return $this->belongsToMany(Disease::class);
     }
 
     public function scopeFilter(Builder $builder, Request $request)

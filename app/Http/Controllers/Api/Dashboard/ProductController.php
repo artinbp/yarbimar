@@ -27,14 +27,14 @@ class ProductController extends Controller
     {
         $fields = $request->validated();
 
-        $id = 0;
-        DB::transaction(function () use ($fields, &$id) {
+        $product = null;
+        DB::transaction(function () use ($fields, &$product) {
             $product = Product::create($fields);
-            $id = $product->id;
-            $product->categories()->attach($fields['categories']);
+            $product->categories()->attach($fields['categories'] ?? []);
             $product->media()->attach($fields['media'] ?? []);
+            $product->diseases()->attach($fields['diseases'] ?? []);
+            $product = $product->fresh();
         });
-        $product = Product::findOrFail($id);
 
         return response()->json($product, Response::HTTP_CREATED);
     }
@@ -51,11 +51,23 @@ class ProductController extends Controller
         $fields = $request->validated();
 
         $product = Product::findOrFail($id);
-        DB::transaction(function () use ($product, $fields) {
+        DB::transaction(function () use (&$product, $fields) {
             $product->update($fields);
-            $product->media()->sync($fields['media']);
+
+            if (isset($fields['categories'])) {
+                $product->categories()->sync($fields['categories']);
+            }
+
+            if (isset($fields['media'])) {
+                $product->media()->sync($fields['media']);
+            }
+
+            if (isset($fields['diseases'])) {
+                $product->diseases()->sync($fields['diseases']);
+            }
+
+            $product = $product->fresh();
         });
-        $product = $product->fresh();
 
         return response()->json($product, Response::HTTP_OK);
     }
