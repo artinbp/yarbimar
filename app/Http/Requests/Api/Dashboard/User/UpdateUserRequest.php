@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Dashboard\User;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateUserRequest extends FormRequest
@@ -23,6 +24,8 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = User::findOrFail($this->route('id'));
+
         return [
             'username' => ['filled', 'string', 'unique:users,username,'.$user->id],
             'first_name' => ['filled', 'string'],

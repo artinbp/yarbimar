@@ -64,11 +64,14 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $fields = $request->validated();
 
-        $role = Role::findOrFail($fields['role']);
-        if ($role->name == Role::ROLE_SUPER_ADMIN) {
-            return response()->json([
-                'message' => 'Changing user role to super admin is not allowed'
-            ], Response::HTTP_UNAUTHORIZED);
+        $role = null;
+        if (isset($fields['role']) && !empty($fields['role'])) {
+            $role = Role::findOrFail($fields['role']);
+            if ($role->name == Role::ROLE_SUPER_ADMIN) {
+                return response()->json([
+                    'message' => 'Changing user role to super admin is not allowed'
+                ], Response::HTTP_UNAUTHORIZED);
+            }
         }
 
         DB::transaction(function () use ($id, $fields, &$user, $role) {
@@ -79,7 +82,7 @@ class UserController extends Controller
 
             $user->update($fields);
 
-            if (isset($fields['role']) && !empty($fields['role'])) {
+            if ($role != null) {
                 $role->users()->save($user);
             }
 

@@ -127,22 +127,18 @@ class OrderController extends Controller
 
     public function read(Request $request, $id): JsonResponse
     {
-        $order = Order::findOrFail($id);
-
-        if ($request->user()->id !== $order->user_id) {
-            return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
-        }
+        $order = Order::where('user_id', '=', $request->user()->id)
+            ->where('id', '=', $id)
+            ->firstOrFail($id);
 
         return response()->json($order, Response::HTTP_OK);
     }
 
     public function cancel(Request $request, $id): JsonResponse
     {
-        $order = Order::findOrFail($id);
-
-        if ($request->user()->id !== $order->user_id) {
-            return response()->json(['message' => 'Record not found.'], Response::HTTP_NOT_FOUND);
-        }
+        $order = Order::where('user_id', '=', $request->user()->id)
+            ->where('id', '=', $id)
+            ->firstOrFail($id);
 
         if ($order->status === Order::STATUS_CANCELLED) {
             return response()->json([
