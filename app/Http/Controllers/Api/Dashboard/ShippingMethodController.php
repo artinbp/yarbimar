@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Dashboard\ShippingMethod\CreateShippingMethodRequest;
-use App\Http\Requests\Api\Dashboard\ShippingMethod\UpdateShippingRequest;
+use App\Http\Requests\Api\Dashboard\ShippingMethod\UpdateShippingMethodRequest;
 use App\Models\ShippingMethod;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,7 +34,7 @@ class ShippingMethodController extends Controller
         return response()->json($delivery, Response::HTTP_OK);
     }
 
-    public function update(UpdateShippingRequest $request, $id): JsonResponse
+    public function update(UpdateShippingMethodRequest $request, $id): JsonResponse
     {
         $shippingMethod = ShippingMethod::findOrFail($id);
         $shippingMethod->update($request->validated());

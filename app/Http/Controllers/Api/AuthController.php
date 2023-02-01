@@ -25,7 +25,6 @@ class AuthController extends Controller
         $fields = $request->validated();
 
         $fields['password'] = bcrypt($fields['password']);
-
         $token = "";
         DB::transaction(function () use ($fields, &$token) {
             $user = User::create($fields);
