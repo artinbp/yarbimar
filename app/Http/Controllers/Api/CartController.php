@@ -10,6 +10,7 @@ use App\Models\CartItem;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CartController extends Controller
@@ -17,6 +18,8 @@ class CartController extends Controller
     public function list(Request $request): JsonResponse
     {
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
+
+        $this->deleteOutOfStockCartItems($cart);
         $cart = $cart->fresh();
 
         return response()->json($cart, Response::HTTP_OK);
@@ -31,6 +34,8 @@ class CartController extends Controller
         }
 
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
+        $this->deleteOutOfStockCartItems($cart);
+        $cart = $cart->fresh();
         $hasProductCartItem = false;
 
         foreach ($cart->items as $item) {
@@ -62,6 +67,8 @@ class CartController extends Controller
     {
         $fields = $request->validated();
         $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
+        $this->deleteOutOfStockCartItems($cart);
+        $cart = $cart->fresh();
 
         foreach ($cart->items as $item) {
             if ($item->product_id == $fields['product_id']) {
@@ -78,5 +85,24 @@ class CartController extends Controller
 
         $cart = $cart->fresh();
         return response()->json($cart, Response::HTTP_OK);
+    }
+
+    private function deleteOutOfStockCartItems(Cart $cart)
+    {
+        $productIds = $cart->items->pluck('product_id');
+        $products = Product::findOrFail($productIds)->keyBy('id');
+
+        $cart->items->each(function ($item) use($products) {
+            $product = $products[$item->product_id];
+            if ($product->stock == 0) {
+                $item->delete();
+            }
+
+            if ($product->stock < $item->quantity) {
+                $diff = $item->quantity - $product->stock;
+                $item->quantity = $item->quantity - $diff;
+                $item->save();
+            }
+        });
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->increments('id');
             $table->integer('cart_id')->unsigned()->nullable()->default(null);
             $table->integer('product_id')->unsigned()->nullable()->default(null);
-            $table->integer('quantity');
+            $table->integer('quantity')->unsigned();
             $table->timestamps();
 
             $table->foreign('cart_id')->references('id')->on('carts')->onDelete('cascade');
