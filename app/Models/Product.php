@@ -57,27 +57,50 @@ class Product extends Model
 
     public function scopeFilter(Builder $builder, Request $request)
     {
-        if ($request->has('search')) {
-            $builder->whereFullText(['title', 'description'], $request->input('search'));
-        }
+        $request->whenFilled('search', fn() => $builder->whereFullText(['title', 'description'], $request->query('search')));
+        $request->whenFilled('price_gte', fn() => $builder->where('price', '>=', $request->query('gte')));
+        $request->whenFilled('price_lte', fn() => $builder->where('price', '<=', $request->query('lte')));
+        $request->whenFilled('color', fn() => $builder->where('color', '=', $request->query('color')));
+        $request->whenFilled('size', fn() => $builder->where('size', '=', $request->query('size')));
+        $request->whenFilled('brand', fn() => $builder->where('brand', '=', $request->query('brand')));
+        $request->whenFilled('manufacturing_country', fn() => $builder->where('manufacturing_country', '=', $request->query('manufacturing_country')));
+        $request->whenFilled('weight', fn() => $builder->where('weight', '=', $request->query('weight')));
+        $request->whenFilled('length', fn() => $builder->where('length', '=', $request->query('length')));
+        $request->whenFilled('breadth', fn() => $builder->where('breadth', '=', $request->query('breadth')));
+        $request->whenFilled('width', fn() => $builder->where('width', '=', $request->query('width')));
 
-        if ($request->has('gte')) {
-            $builder->where('price', '>=', $request->input('gte'));
-        }
+        $request->whenFilled('in_stock', function() use($request, $builder) {
+            $inStock = $request->query('in_stock');
+            if ($inStock === true) {
+                $builder->where('stock', '>=', 1);;
+            }
 
-        if ($request->has('lte')) {
-            $builder->where('price', '<=', $request->input('lte'));
-        }
+            if ($inStock === false) {
+                $builder->where('stock', '=', 0);;
+            }
+        });
 
-        if ($request->has('in_stock') && $request->input('in_stock') == true) {
-            $builder->where('stock', '>=', 1);
-        }
+        $request->whenFilled('categories', function () use($request, $builder) {
+            $categories = $request->query('categories');
+            if (!is_array($categories)) {
+                return;
+            }
 
-        if ($request->has('categories') && is_array($request->input('categories'))) {
-            foreach($request->categories as $category) {
+            foreach($categories as $category) {
                 $builder->orWhereRelation('categories', 'category_id', '=', $category);
             }
-        }
+        });
+
+        $request->whenFilled('diseases', function() use($request, $builder) {
+            $diseases = $request->query('diseases');
+            if (!is_array($diseases)) {
+                return;
+            }
+
+            foreach($diseases as $disease) {
+                $builder->orWhereRelation('diseases', 'disease_id', '=', $disease);
+            }
+        });
 
         return $builder;
     }
