@@ -86,9 +86,9 @@ class Product extends Model
                 return;
             }
 
-            foreach($categories as $category) {
-                $builder->orWhereRelation('categories', 'category_id', '=', $category);
-            }
+            $builder->whereHas('categories', function (Builder $builder) use ($categories) {
+                    $builder->whereIn('category_id', $categories);
+            },'=', count($categories));
         });
 
         $request->whenFilled('diseases', function() use($request, $builder) {
@@ -97,9 +97,9 @@ class Product extends Model
                 return;
             }
 
-            foreach($diseases as $disease) {
-                $builder->orWhereRelation('diseases', 'disease_id', '=', $disease);
-            }
+            $builder->whereHas('diseases', function(Builder $query) use($diseases) {
+                    $query->whereIn('disease_id', $diseases);
+            }, '=', count($diseases));
         });
 
         return $builder;
