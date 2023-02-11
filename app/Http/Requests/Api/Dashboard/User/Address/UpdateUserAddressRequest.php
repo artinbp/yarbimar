@@ -29,10 +29,10 @@ class UpdateUserAddressRequest extends FormRequest
             'city' => ['filled', 'string'],
             'building_number' => ['filled', 'numeric'],
             'unit_number' => ['filled', 'numeric'],
-            'zip_code' => ['filled', 'numeric'],
+            'zip_code' => ['filled', 'string'],
             'receiver_first_name' => ['filled', 'string'],
             'receiver_last_name' => ['filled', 'string'],
-            'receiver_phone' => ['filled'],
+            'receiver_phone' => ['filled', 'string'],
         ];
     }
 }
