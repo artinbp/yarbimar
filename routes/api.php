@@ -106,7 +106,9 @@ Route::get('/v1/profile/orders', [OrderController::class, 'list'])->middleware('
 Route::post('/v1/profile/orders', [OrderController::class, 'create'])->middleware('auth:sanctum');
 Route::get('/v1/profile/orders/{id}', [OrderController::class, 'read'])->middleware('auth:sanctum');
 Route::get('/v1/profile/orders/{id}/cancel', [OrderController::class, 'cancel'])->middleware('auth:sanctum');
-Route::get('/v1/profile/orders/{id}/purchase', [OrderController::class, 'purchase'])->middleware('auth:sanctum');
+Route::post('/v1/dashboard/orders/{id}/pay', [OrderController::class, 'pay'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::get('/v1/dashboard/orders/transactions/{transactionId}/verify', [OrderController::class, 'verify'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin'])
+    ->name('order.transaction.verify');
 
 Route::get('/v1/shipping_methods', [ShippingMethodController::class, 'list'])->middleware('auth:sanctum');
 Route::post('/v1/orders/cost', [OrderController::class, 'cost'])->middleware('auth:sanctum');

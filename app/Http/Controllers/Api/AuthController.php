@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterUserRequest;
@@ -29,7 +30,7 @@ class AuthController extends Controller
         DB::transaction(function () use ($fields, &$token) {
             $user = User::create($fields);
 
-            $customerRole = Role::where('name', Role::ROLE_CUSTOMER)->first();
+            $customerRole = Role::where('name', UserRoleEnum::CUSTOMER)->first();
             $customerRole->users()->save($user);
 
             if (isset($fields['addresses']) && count($fields['addresses'])) {

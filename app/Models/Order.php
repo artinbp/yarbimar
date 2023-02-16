@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatusEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,24 +14,16 @@ class Order extends Model
 {
     use HasFactory;
 
-    public const STATUS_PENDING = "pending";
-    public const STATUS_PROCESSING = "processing";
-    public const STATUS_COMPLETED = "completed";
-    public const STATUS_CANCELLED = "cancelled";
-
-    public static $statuses = [
-        self::STATUS_PENDING,
-        self::STATUS_PROCESSING,
-        self::STATUS_COMPLETED,
-        self::STATUS_CANCELLED,
-    ];
-
     protected $fillable = [
         'total',
         'status'
     ];
 
-    protected $with = ['products', 'payment'];
+    protected $with = ['products'];
+
+    protected $casts = [
+        'status' => OrderStatusEnum::class,
+    ];
 
     public function products(): BelongsToMany
     {
@@ -45,6 +38,11 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(Invoice::class);
     }
 
     public function scopeFilter(Builder $builder, Request $request)

@@ -55,54 +55,54 @@ class Product extends Model
         return $this->belongsToMany(Disease::class);
     }
 
-    public function scopeFilter(Builder $builder, Request $request)
+    public function scopeFilter(Builder $query, Request $request)
     {
-        $request->whenFilled('search', fn() => $builder->whereFullText(['title', 'description'], $request->query('search')));
-        $request->whenFilled('price_gte', fn() => $builder->where('price', '>=', $request->query('gte')));
-        $request->whenFilled('price_lte', fn() => $builder->where('price', '<=', $request->query('lte')));
-        $request->whenFilled('color', fn() => $builder->where('color', '=', $request->query('color')));
-        $request->whenFilled('size', fn() => $builder->where('size', '=', $request->query('size')));
-        $request->whenFilled('brand', fn() => $builder->where('brand', '=', $request->query('brand')));
-        $request->whenFilled('manufacturing_country', fn() => $builder->where('manufacturing_country', '=', $request->query('manufacturing_country')));
-        $request->whenFilled('weight', fn() => $builder->where('weight', '=', $request->query('weight')));
-        $request->whenFilled('length', fn() => $builder->where('length', '=', $request->query('length')));
-        $request->whenFilled('breadth', fn() => $builder->where('breadth', '=', $request->query('breadth')));
-        $request->whenFilled('width', fn() => $builder->where('width', '=', $request->query('width')));
+        $request->whenFilled('search', fn() => $query->whereFullText(['title', 'description'], $request->query('search')));
+        $request->whenFilled('price_gte', fn() => $query->where('price', '>=', $request->query('gte')));
+        $request->whenFilled('price_lte', fn() => $query->where('price', '<=', $request->query('lte')));
+        $request->whenFilled('color', fn() => $query->where('color', '=', $request->query('color')));
+        $request->whenFilled('size', fn() => $query->where('size', '=', $request->query('size')));
+        $request->whenFilled('brand', fn() => $query->where('brand', '=', $request->query('brand')));
+        $request->whenFilled('manufacturing_country', fn() => $query->where('manufacturing_country', '=', $request->query('manufacturing_country')));
+        $request->whenFilled('weight', fn() => $query->where('weight', '=', $request->query('weight')));
+        $request->whenFilled('length', fn() => $query->where('length', '=', $request->query('length')));
+        $request->whenFilled('breadth', fn() => $query->where('breadth', '=', $request->query('breadth')));
+        $request->whenFilled('width', fn() => $query->where('width', '=', $request->query('width')));
 
-        $request->whenFilled('in_stock', function() use($request, $builder) {
+        $request->whenFilled('in_stock', function() use($request, $query) {
             $inStock = $request->query('in_stock');
             if ($inStock === true) {
-                $builder->where('stock', '>=', 1);;
+                $query->where('stock', '>=', 1);;
             }
 
             if ($inStock === false) {
-                $builder->where('stock', '=', 0);;
+                $query->where('stock', '=', 0);;
             }
         });
 
-        $request->whenFilled('categories', function () use($request, $builder) {
+        $request->whenFilled('categories', function () use($request, $query) {
             $categories = $request->query('categories');
             if (!is_array($categories)) {
                 return;
             }
 
-            $builder->whereHas('categories', function (Builder $builder) use ($categories) {
-                    $builder->whereIn('category_id', $categories);
+            $query->whereHas('categories', function (Builder $query) use ($categories) {
+                $query->whereIn('category_id', $categories);
             },'=', count($categories));
         });
 
-        $request->whenFilled('diseases', function() use($request, $builder) {
+        $request->whenFilled('diseases', function() use($request, $query) {
             $diseases = $request->query('diseases');
             if (!is_array($diseases)) {
                 return;
             }
 
-            $builder->whereHas('diseases', function(Builder $query) use($diseases) {
+            $query->whereHas('diseases', function(Builder $query) use($diseases) {
                     $query->whereIn('disease_id', $diseases);
             }, '=', count($diseases));
         });
 
-        return $builder;
+        return $query;
     }
 
     public function getThumbnailUrlAttribute() {

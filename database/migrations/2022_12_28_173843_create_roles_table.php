@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserRoleEnum;
 use App\Models\Role;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -21,7 +22,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        foreach (Role::$roles as $role) {
+        foreach (UserRoleEnum::cases() as $role) {
             Role::create(['name' => $role]);
         }
     }

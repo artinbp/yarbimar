@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('transaction_id')->unsigned()->nullable()->default(null);
             $table->decimal('amount');
-            $table->string('provider');
-            $table->enum('status', ['unpaid', 'paid'])->default('unpaid');
-            $table->bigInteger('transaction_id');
             $table->timestamps();
+
+            $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('cascade');
         });
     }
 

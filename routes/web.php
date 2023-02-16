@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
+use Shetabit\Multipay\Invoice;
+use Shetabit\Payment\Facade\Payment;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,5 +18,12 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    $invoice = (new Invoice)->amount(1000);
+
+// Purchase the given invoice.
+    Payment::purchase($invoice,function($driver, $transactionId) {
+        // We can store $transactionId in database.
+        echo $transactionId;
+        echo "<br>";
+    })->pay()->render();
 });

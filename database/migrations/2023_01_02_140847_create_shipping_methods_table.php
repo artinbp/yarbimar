@@ -13,10 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->integer('role_id')->unsigned()->nullable();
-
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
+        Schema::create('shipping_methods', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->text('description');
+            $table->decimal('fee');
+            $table->boolean('disabled')->default(false);
+            $table->timestamps();
         });
     }
 
@@ -27,8 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('delivary_methods');
     }
 };

@@ -24,15 +24,7 @@ class CreateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'products' => ['array'],
-            'products.*' => ['required', 'filled', 'distinct', function($attribute, $value, $fail) {
-                if (!is_numeric((int) $value)) {
-                    $fail('The product id should be numeric.');
-                }
-            }],
-            'products.*.quantity' => ['required', 'filled', 'numeric', 'gt:0'],
-            'products.*.price'    => ['required', 'filled', 'numeric', 'gt:0'],
-            'address_id' => ['required', 'filled', 'numeric', 'exists:addresses,id'],
+            'address_id'         => ['required', 'filled', 'numeric', 'exists:addresses,id'],
             'shipping_method_id' => ['required', 'filled', 'numeric', 'exists:shipping_methods,id'],
         ];
     }

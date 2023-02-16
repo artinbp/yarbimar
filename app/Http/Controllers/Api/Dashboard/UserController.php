@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Dashboard;
 
+use App\Enums\UserRoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Dashboard\User\CreateUserRequest;
 use App\Http\Requests\Api\Dashboard\User\UpdateUserRequest;
@@ -30,7 +31,7 @@ class UserController extends Controller
         $fields = $request->validated();
 
         $role = Role::findOrFail($fields['role']);
-        if ($role->name == Role::ROLE_SUPER_ADMIN) {
+        if ($role->name == UserRoleEnum::SUPER_ADMIN) {
             return response()->json([
                 'message' => 'Creating new user with the super admin role is not allowed'
             ], Response::HTTP_UNAUTHORIZED);
@@ -67,7 +68,7 @@ class UserController extends Controller
         $role = null;
         if (isset($fields['role']) && !empty($fields['role'])) {
             $role = Role::findOrFail($fields['role']);
-            if ($role->name == Role::ROLE_SUPER_ADMIN) {
+            if ($role->name == UserRoleEnum::SUPER_ADMIN) {
                 return response()->json([
                     'message' => 'Changing user role to super admin is not allowed'
                 ], Response::HTTP_UNAUTHORIZED);
@@ -109,7 +110,7 @@ class UserController extends Controller
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        if ($user->hasRole(Role::ROLE_SUPER_ADMIN)) {
+        if ($user->hasRole(UserRoleEnum::SUPER_ADMIN)) {
             return response()->json([
                 'message' => 'User with super admin role can not be deleted'
             ], Response::HTTP_UNAUTHORIZED);

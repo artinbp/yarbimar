@@ -16,8 +16,9 @@ return new class extends Migration
         Schema::create('order_product', function (Blueprint $table) {
             $table->integer('product_id')->unsigned();
             $table->integer('order_id')->unsigned();
-            $table->integer('quantity');
-            $table->decimal('price');
+            $table->integer('quantity')->unsigned();
+            $table->decimal('price')->unsigned();
+            $table->decimal('discount')->unsigned()->nullable()->default(null);
 
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');

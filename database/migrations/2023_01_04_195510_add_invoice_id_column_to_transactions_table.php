@@ -13,18 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('invoice_item', function (Blueprint $table) {
-            $table->increments('id');
-
-            $table->integer('invoice_id')->unsigned()->nullable()->default(null);
-            $table->integer('quantity');
-            $table->decimal('price');
-            $table->decimal('amount');
-            $table->text('description')->nullable()->default(null);
-
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->integer('invoice_id')->unsigned()->nullable()->default(null)->after('status');
             $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
-
-            $table->timestamps();
         });
     }
 
@@ -35,6 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('invoice_item');
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->dropColumn('invoice_id');
+        });
     }
 };

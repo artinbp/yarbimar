@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use \Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -15,14 +16,14 @@ return new class extends Migration
     {
         Schema::create('invoices', function (Blueprint $table) {
             $table->increments('id');
-
-            $table->integer('user_id')->unsigned();
-            $table->date('invoice_date');
-            $table->string('invoice_number');
+            $table->uuid('number')->unique()->default(DB::raw('(UUID())'));
+            $table->decimal('total_amount')->unsigned()->default(0);
+            $table->integer('user_id')->unsigned()->nullable()->default(null);
+            $table->integer('payment_id')->unsigned()->nullable()->default(null);
+            $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
-            $table->timestamps();
+            $table->foreign('payment_id')->references('id')->on('payments')->onDelete('cascade');
         });
     }
 

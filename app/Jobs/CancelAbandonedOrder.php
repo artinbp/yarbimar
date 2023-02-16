@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\OrderStatusEnum;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -46,8 +47,8 @@ class CancelAbandonedOrder implements ShouldQueue
                 return;
             }
 
-            if ($order->status === Order::STATUS_PENDING) {
-                $order->update(['status' => Order::STATUS_CANCELLED]);
+            if ($order->status === OrderStatusEnum::PENDING) {
+                $order->update(['status' => OrderStatusEnum::CANCELLED]);
                 // TODO: plush stock.
 
                 foreach ($order->products as $product) {
