@@ -30,11 +30,6 @@ class Order extends Model
         return $this->belongsToMany(Product::class)->withPivot('quantity', 'price');
     }
 
-    public function payment(): BelongsTo
-    {
-        return $this->belongsTo(Payment::class);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -43,6 +38,11 @@ class Order extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(Invoice::class);
+    }
+
+    public function isPaid(): bool
+    {
+        return $this->invoice->payment()->exists();
     }
 
     public function scopeFilter(Builder $builder, Request $request)

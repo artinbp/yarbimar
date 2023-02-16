@@ -15,11 +15,9 @@ use App\Models\ShippingMethod;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Transaction;
-use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Shetabit\Multipay\Contracts\ReceiptInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 use Shetabit\Payment\Facade\Payment;
@@ -62,7 +60,7 @@ class OrderController extends Controller
         }
 
         // TODO: check if there is any other active (processing or pending) order
-        // going on. if there is any do not allow for creating new one. It should
+        // going on. if there is any do not allow for creating new one. It should-A
         // complete or cancel the other order before creating new one.
 
         DB::beginTransaction();
