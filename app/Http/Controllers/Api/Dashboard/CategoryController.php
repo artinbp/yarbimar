@@ -56,7 +56,8 @@ class CategoryController extends Controller
     {
         $fields = $request->validated();
 
-        $category = Category::findOrFail($id)->update($fields);
+        $category = Category::findOrFail($id);
+        $category->update($fields);
         $category = $category->fresh();
 
         return response()->json($category, Response::HTTP_OK);
