@@ -21,7 +21,7 @@ class CancelAbandonedOrder implements ShouldQueue
      *
      * @var Order
      */
-    public Order $order;
+    private Order $order;
 
     /**
      * Create a new job instance.
@@ -38,7 +38,7 @@ class CancelAbandonedOrder implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         DB::transaction(function() {
             // refresh order instance with new data.
