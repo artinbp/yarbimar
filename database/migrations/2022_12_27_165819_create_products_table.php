@@ -24,10 +24,10 @@ return new class extends Migration
             $table->jsonb('sizes')->nullable()->default(null);
             $table->string('brand');
             $table->string('manufacturing_country');
-            $table->decimal('weight');
-            $table->decimal('length');
-            $table->decimal('breadth');
-            $table->decimal('width');
+            $table->string('weight');
+            $table->string('length');
+            $table->string('breadth');
+            $table->string('width');
             $table->timestamps();
 
             $table->fullText(['title', 'description']);

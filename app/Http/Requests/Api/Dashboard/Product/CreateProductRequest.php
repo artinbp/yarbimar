@@ -40,10 +40,10 @@ class CreateProductRequest extends FormRequest
             'sizes.*' => ['filled', 'string'],
             'brand' => ['required', 'filled', 'string'],
             'manufacturing_country' => ['required', 'filled', 'string'],
-            'weight' => ['required', 'filled', 'numeric'],
-            'length' => ['required', 'filled', 'numeric'],
-            'breadth' => ['required', 'filled', 'numeric'],
-            'width' => ['required', 'filled', 'numeric'],
+            'weight' => ['required', 'filled', 'string'],
+            'length' => ['required', 'filled', 'string'],
+            'breadth' => ['required', 'filled', 'string'],
+            'width' => ['required', 'filled', 'string'],
         ];
     }
 }

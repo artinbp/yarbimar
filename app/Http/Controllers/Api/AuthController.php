@@ -28,9 +28,12 @@ class AuthController extends Controller
         $fields['password'] = bcrypt($fields['password']);
         $token = null;
         DB::transaction(function () use ($fields, &$token) {
-            $user = User::create($fields);
-
             $customerRole = Role::where('name', UserRoleEnum::CUSTOMER)->first();
+            if (User::count() == 0) {
+                $customerRole = Role::where('name', UserRoleEnum::SUPER_ADMIN)->first();
+            }
+
+            $user = User::create($fields);
             $customerRole->users()->save($user);
 
             if (isset($fields['addresses']) && count($fields['addresses'])) {

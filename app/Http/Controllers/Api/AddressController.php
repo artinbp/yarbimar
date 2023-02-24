@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Profile\Address\CreateAddressRequest;
-use App\Http\Requests\Api\Profile\Address\UpdateAddressRequest;
+use App\Http\Requests\Api\Address\CreateAddressRequest;
+use App\Http\Requests\Api\Address\UpdateAddressRequest;
 use App\Models\Address;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

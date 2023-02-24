@@ -41,10 +41,10 @@ class UpdateProductRequest extends FormRequest
             'sizes.*' => ['filled', 'string'],
             'brand' => ['filled', 'string'],
             'manufacturing_country' => ['filled', 'string'],
-            'weight' => ['filled', 'numeric'],
-            'length' => ['filled', 'numeric'],
-            'breadth' => ['filled', 'numeric'],
-            'width' => ['filled', 'numeric'],
+            'weight' => ['filled', 'string'],
+            'length' => ['filled', 'string'],
+            'breadth' => ['filled', 'string'],
+            'width' => ['filled', 'string'],
         ];
     }
 }
