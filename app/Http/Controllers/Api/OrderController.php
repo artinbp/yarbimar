@@ -1,29 +1,31 @@
 <?php
 
-namespace App\Http\Controllers\Api\Profile;
+namespace App\Http\Controllers\Api;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\TransactionStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Profile\Order\CreateOrderRequest;
-use App\Jobs\CancelAbandonedOrder;
+use App\Jobs\CancelAbandonedOrderJob;
 use App\Models\Address;
 use App\Models\Cart;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
-use App\Models\ShippingMethod;
 use App\Models\Order;
+use App\Models\Payment as PaymentModel;
 use App\Models\Product;
+use App\Models\ShippingMethod;
 use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Shetabit\Multipay\Exceptions\InvalidPaymentException;
+use Shetabit\Payment\Facade\Payment;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
-use Shetabit\Payment\Facade\Payment;
+use function now;
 use function response;
-use Shetabit\Multipay\Exceptions\InvalidPaymentException;
-Use App\Models\Payment as PaymentModel;
+use function route;
 
 
 class OrderController extends Controller
@@ -149,7 +151,7 @@ class OrderController extends Controller
             $shipping->orders()->save($order);
             $cart->Delete();
 
-            CancelAbandonedOrder::dispatch($order)
+            CancelAbandonedOrderJob::dispatch($order)
                 ->delay(now()->addMinutes(15));
 
             $order = $order->fresh();
@@ -236,6 +238,9 @@ class OrderController extends Controller
             ->where('id', '=', $transactionId)
             ->firstOrFail();
 
+        // TODO: check whether the order is in pending state or invoice hasn't paid already.
+        // $transaction->invoice->order
+
         try {
             $receipt = Payment::amount($transaction->amount)->transactionId($transaction->number)->verify();
         } catch (InvalidPaymentException $e) {
@@ -300,8 +305,25 @@ class OrderController extends Controller
                 Response::HTTP_BAD_REQUEST
             );
         }
+        DB::beginTransaction();
+        $order = $this->order->fresh();
+        if ($order == null) {
+            DB::rollBack();
+//            return;
+        }
+
+        if ($order->status === OrderStatusEnum::PENDING) {
+            $order->update(['status' => OrderStatusEnum::CANCELLED]);
+
+            foreach ($order->products as $product) {
+                $product->stock = $product->stock + $product->pivot->quantity;
+                $product->save();
+            }
+        }
 
         $order->update(['status' => OrderStatusEnum::CANCELLED]);
+
+        DB::commit();
 
         return response()->json(['message' => 'Order cancelled']);
     }

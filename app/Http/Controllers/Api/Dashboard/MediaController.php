@@ -63,6 +63,9 @@ class MediaController extends Controller
             Storage::disk('public')->delete($media->path);
         });
 
-        return response()->json(['message' => 'Media successfully deleted'], Response::HTTP_OK);
+        return response()->json(
+            ['message' => __('messages.deleted', ['entity' => __('entity.media')])],
+            Response::HTTP_OK
+        );
     }
 }

@@ -33,13 +33,12 @@ class CategoryController extends Controller
 
         if ($depth > self::maxCategoryDepth) {
             return response()->json(
-                ['message' => 'Category\'s depth can not be greater than ' . self::maxCategoryDepth + 1],
+                ['message' => __('messages.create_category_with_more_than_x_depth', ['depth' => self::maxCategoryDepth + 1])],
                 Response::HTTP_UNPROCESSABLE_ENTITY,
             );
         }
 
         $fields['depth'] = $depth;
-
         $category = Category::create($fields);
 
         return response()->json($category, Response::HTTP_CREATED);
@@ -68,6 +67,9 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return response()->json(['message' => 'Category successfully deleted'], Response::HTTP_OK);
+        return response()->json(
+            ['message' => __('messages.deleted', ['entity' => __('entity.category')])],
+            Response::HTTP_OK
+        );
     }
 }

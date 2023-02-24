@@ -32,9 +32,10 @@ class UserController extends Controller
 
         $role = Role::findOrFail($fields['role']);
         if ($role->name == UserRoleEnum::SUPER_ADMIN) {
-            return response()->json([
-                'message' => 'Creating new user with the super admin role is not allowed'
-            ], Response::HTTP_UNAUTHORIZED);
+            return response()->json(
+                ['message' => __('messages.new_user_super_admin_role')],
+                Response::HTTP_UNAUTHORIZED,
+            );
         }
 
         $fields['password'] = bcrypt($fields['password']);
@@ -69,9 +70,10 @@ class UserController extends Controller
         if (isset($fields['role']) && !empty($fields['role'])) {
             $role = Role::findOrFail($fields['role']);
             if ($role->name == UserRoleEnum::SUPER_ADMIN) {
-                return response()->json([
-                    'message' => 'Changing user role to super admin is not allowed'
-                ], Response::HTTP_UNAUTHORIZED);
+                return response()->json(
+                    ['message' => __('messages.change_role_to_super_admin')],
+                    Response::HTTP_UNAUTHORIZED,
+                );
             }
         }
 
@@ -105,19 +107,24 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         if ($user->id == $request->user()->id) {
-            return response()->json([
-                'message' => 'A user can not delete itself'
-            ], Response::HTTP_UNAUTHORIZED);
+            return response()->json(
+                ['message' => __('messages.user_delete_its_self')],
+                Response::HTTP_UNAUTHORIZED,
+            );
         }
 
         if ($user->hasRole(UserRoleEnum::SUPER_ADMIN)) {
-            return response()->json([
-                'message' => 'User with super admin role can not be deleted'
-            ], Response::HTTP_UNAUTHORIZED);
+            return response()->json(
+                ['message' => __('messages.delete_user_with_super_admin_role')],
+                Response::HTTP_UNAUTHORIZED,
+            );
         }
 
         $user->delete();
 
-        return response()->json(['message' => 'User successfully deleted'], Response::HTTP_OK);
+        return response()->json(
+            ['message' => __('messages.deleted', ['entity' => __('entity.user')])],
+            Response::HTTP_OK
+        );
     }
 }

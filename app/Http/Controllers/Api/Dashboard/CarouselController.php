@@ -30,9 +30,10 @@ class CarouselController extends Controller
 
         $count = Carousel::count();
         if ($count >= self::MAX_CAROUSEL) {
-            return response()->json([
-                'message' => 'You can\'t create more than ' . self::MAX_CAROUSEL . ' carousel'
-            ], Response::HTTP_FORBIDDEN);
+            return response()->json(
+                ['message' => __('messages.create_more_than_x_carousel', ['limit' => self::MAX_CAROUSEL])],
+                Response::HTTP_FORBIDDEN,
+            );
         }
 
         $media = Media::findOrFail($fields['media_id']);
@@ -77,6 +78,9 @@ class CarouselController extends Controller
         $carousel = Carousel::findOrFail($id);
         $carousel->delete();
 
-        return response()->json(['message' => 'Carousel successfully deleted'], Response::HTTP_OK);
+        return response()->json(
+            ['message' => __('messages.deleted', ['entity' => __('entity.carousel')])],
+            Response::HTTP_OK
+        );
     }
 }

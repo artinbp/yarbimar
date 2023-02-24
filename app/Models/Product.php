@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Category;
-
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,8 +20,8 @@ class Product extends Model
         'price',
         'thumbnail_path',
         'stock',
-        'color',
-        'size',
+        'colors',
+        'sizes',
         'brand',
         'manufacturing_country',
         'weight',
@@ -36,6 +34,11 @@ class Product extends Model
         'media',
         'categories',
         'diseases'
+    ];
+
+    protected $casts = [
+        'sizes' => 'array',
+        'colors' => 'array'
     ];
 
     protected $appends = ['thumbnail_url'];
@@ -58,16 +61,32 @@ class Product extends Model
     public function scopeFilter(Builder $query, Request $request)
     {
         $request->whenFilled('search', fn() => $query->whereFullText(['title', 'description'], $request->query('search')));
-        $request->whenFilled('price_gte', fn() => $query->where('price', '>=', $request->query('gte')));
-        $request->whenFilled('price_lte', fn() => $query->where('price', '<=', $request->query('lte')));
-        $request->whenFilled('color', fn() => $query->where('color', '=', $request->query('color')));
-        $request->whenFilled('size', fn() => $query->where('size', '=', $request->query('size')));
+        $request->whenFilled('price_gte', fn() => $query->where('price', '>=', $request->query('price_gte')));
+        $request->whenFilled('price_lte', fn() => $query->where('price', '<=', $request->query('price_lte')));
         $request->whenFilled('brand', fn() => $query->where('brand', '=', $request->query('brand')));
         $request->whenFilled('manufacturing_country', fn() => $query->where('manufacturing_country', '=', $request->query('manufacturing_country')));
         $request->whenFilled('weight', fn() => $query->where('weight', '=', $request->query('weight')));
         $request->whenFilled('length', fn() => $query->where('length', '=', $request->query('length')));
         $request->whenFilled('breadth', fn() => $query->where('breadth', '=', $request->query('breadth')));
         $request->whenFilled('width', fn() => $query->where('width', '=', $request->query('width')));
+
+        $request->whenFilled('colors', function() use ($query, $request) {
+            $colors = $request->query('colors');
+            if (!is_array($colors)) {
+                return;
+            }
+
+            $query->whereJsonContains('colors', $colors);
+        });
+
+        $request->whenFilled('sizes', function() use ($query, $request) {
+            $sizes = $request->query('sizes');
+            if (!is_array($sizes)) {
+                return;
+            }
+
+            $query->whereJsonContains('sizes', $sizes);
+        });
 
         $request->whenFilled('in_stock', function() use($request, $query) {
             $inStock = $request->query('in_stock');

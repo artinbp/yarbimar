@@ -53,6 +53,9 @@ class DiseaseController extends Controller
         $disease = Disease::findOrFail($id);
         $disease->delete();
 
-        return response()->json(['message' => 'Disease successfully deleted.'], Response::HTTP_OK);
+        return response()->json(
+            ['message' => __('messages.deleted', ['entity' => __('entity.disease')])],
+            Response::HTTP_OK
+        );
     }
 }

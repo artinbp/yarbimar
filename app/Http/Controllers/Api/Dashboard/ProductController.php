@@ -30,9 +30,11 @@ class ProductController extends Controller
         $product = null;
         DB::transaction(function () use ($fields, &$product) {
             $product = Product::create($fields);
+
             $product->categories()->attach($fields['categories'] ?? []);
             $product->media()->attach($fields['media'] ?? []);
             $product->diseases()->attach($fields['diseases'] ?? []);
+
             $product = $product->fresh();
         });
 
@@ -77,6 +79,9 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $product->delete();
 
-        return response()->json(['message' => 'Product successfully deleted'], Response::HTTP_OK);
+        return response()->json(
+            ['message' => __('messages.deleted', ['entity' => __('entity.product')])],
+            Response::HTTP_OK,
+        );
     }
 }

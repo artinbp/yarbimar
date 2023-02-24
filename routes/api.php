@@ -1,23 +1,23 @@
 <?php
 
+use App\Http\Controllers\Api\AddressController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CarouselController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\Dashboard\CarouselController as DashboardCarouselController;
 use App\Http\Controllers\Api\Dashboard\CategoryController as DashboardCategoryController;
+use App\Http\Controllers\Api\Dashboard\DiseaseController as DashboardDiseaseController;
 use App\Http\Controllers\Api\Dashboard\MediaController as DashboardMediaController;
 use App\Http\Controllers\Api\Dashboard\OrderController as DashboardOrderController;
 use App\Http\Controllers\Api\Dashboard\ProductController as DashboardProductController;
 use App\Http\Controllers\Api\Dashboard\RoleController as DashboardRoleController;
-use App\Http\Controllers\Api\Dashboard\UserController as DashboardUserController;
-use App\Http\Controllers\Api\Dashboard\UserAddressController as DashboardUserAddressController;
 use App\Http\Controllers\Api\Dashboard\ShippingMethodController as DashboardShippingMethodController;
-use App\Http\Controllers\Api\Dashboard\DiseaseController as DashboardDiseaseController;
-use App\Http\Controllers\Api\ShippingMethodController;
+use App\Http\Controllers\Api\Dashboard\UserAddressController as DashboardUserAddressController;
+use App\Http\Controllers\Api\Dashboard\UserController as DashboardUserController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\Profile\AddressController;
-use App\Http\Controllers\Api\Profile\OrderController;
+use App\Http\Controllers\Api\ShippingMethodController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -94,8 +94,6 @@ Route::get('/v1/dashboard/carousel/{id}', [DashboardCarouselController::class, '
 Route::patch('/v1/dashboard/carousel/{id}', [DashboardCarouselController::class, 'update'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 Route::delete('/v1/dashboard/carousel/{id}', [DashboardCarouselController::class, 'delete'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
 
-// ---------- Profile Routes ----------
-
 Route::get('/v1/profile/addresses', [AddressController::class, 'list'])->middleware('auth:sanctum');
 Route::post('/v1/profile/addresses', [AddressController::class, 'create'])->middleware('auth:sanctum');
 Route::get('/v1/profile/addresses/{id}', [AddressController::class, 'read'])->middleware('auth:sanctum');
@@ -106,8 +104,8 @@ Route::get('/v1/profile/orders', [OrderController::class, 'list'])->middleware('
 Route::post('/v1/profile/orders', [OrderController::class, 'create'])->middleware('auth:sanctum');
 Route::get('/v1/profile/orders/{id}', [OrderController::class, 'read'])->middleware('auth:sanctum');
 Route::get('/v1/profile/orders/{id}/cancel', [OrderController::class, 'cancel'])->middleware('auth:sanctum');
-Route::post('/v1/dashboard/orders/{id}/pay', [OrderController::class, 'pay'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
-Route::get('/v1/dashboard/orders/transactions/{transactionId}/verify', [OrderController::class, 'verify'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin'])
+Route::post('/v1/orders/{id}/pay', [OrderController::class, 'pay'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin']);
+Route::get('/v1/orders/transactions/{transactionId}/verify', [OrderController::class, 'verify'])->middleware(['auth:sanctum', 'role:role_admin,role_super_admin'])
     ->name('order.transaction.verify');
 
 Route::get('/v1/shipping_methods', [ShippingMethodController::class, 'list'])->middleware('auth:sanctum');

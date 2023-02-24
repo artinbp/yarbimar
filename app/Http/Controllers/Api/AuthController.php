@@ -26,7 +26,7 @@ class AuthController extends Controller
         $fields = $request->validated();
 
         $fields['password'] = bcrypt($fields['password']);
-        $token = "";
+        $token = null;
         DB::transaction(function () use ($fields, &$token) {
             $user = User::create($fields);
 
@@ -48,11 +48,11 @@ class AuthController extends Controller
         $fields = $request->validated();
 
         $user = User::where('email', $fields['email'])->first();
-
         if (!$user || !Hash::check($fields['password'], $user->password)) {
-            return response()->json([
-                'message' => "Bad credentials"
-            ], Response::HTTP_UNAUTHORIZED);
+            return response()->json(
+                ['message' => __('auth.failed')],
+                Response::HTTP_UNAUTHORIZED,
+            );
         }
 
         $token = $user->createToken(self::TOKEN_NAME)->plainTextToken;
@@ -64,12 +64,12 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Logged out'], Response::HTTP_OK);
+        return response()->json(['message' => __('auth.logout')], Response::HTTP_OK);
     }
 
     public function user(Request $request): JsonResponse
     {
-        $user = $request->user()->get();
+        $user = auth()->user();
 
         return response()->json($user, Response::HTTP_OK);
     }

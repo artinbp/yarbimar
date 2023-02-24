@@ -66,6 +66,9 @@ class UserAddressController extends Controller
 
         $address->delete();
 
-        return response()->json(['message' => 'Address successfully deleted'], Response::HTTP_OK);
+        return response()->json(
+            ['message' => __('messages.deleted', ['entity' => __('entity.address')])],
+            Response::HTTP_OK
+        );
     }
 }
