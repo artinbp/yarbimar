@@ -20,3 +20,14 @@ use Shetabit\Payment\Facade\Payment;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/test', function() {
+    $invoice = (new Invoice)->amount(1000);
+
+// Purchase the given invoice.
+    Payment::purchase($invoice,function($driver, $transactionId) {
+        // We can store $transactionId in database.
+        echo $transactionId;
+        echo "<br>";
+    })->pay()->render();
+});
