@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 // ---------- Auth Routes ----------
 
 Route::get('/v1/auth/user', [AuthController::class, 'user'])->middleware('auth:sanctum');
+Route::post('/v1/auth/user', [AuthController::class, 'update'])->middleware('auth:sanctum');
 Route::post('/v1/auth/register', [AuthController::class, 'register'])->middleware('guest');
 Route::post('/v1/auth/login', [AuthController::class, 'login'])->middleware('guest');
 Route::post('/v1/auth/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');

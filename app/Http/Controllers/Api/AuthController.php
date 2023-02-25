@@ -6,6 +6,7 @@ use App\Enums\UserRoleEnum;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RegisterUserRequest;
+use App\Http\Requests\Api\Auth\UpdateUserRequest;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -46,6 +47,17 @@ class AuthController extends Controller
         return response()->json(['token' => $token], Response::HTTP_CREATED);
     }
 
+    public function update(UpdateUserRequest  $request): JsonResponse
+    {
+        $fields = $request->validated();
+
+        $user = auth()->user();
+        $user->update($fields);
+        $user = $user->fresh();
+
+        return response()->json($user, Response::HTTP_OK);
+    }
+
     public function login(LoginRequest $request): JsonResponse
     {
         $fields = $request->validated();
@@ -70,7 +82,7 @@ class AuthController extends Controller
         return response()->json(['message' => __('auth.logout')], Response::HTTP_OK);
     }
 
-    public function user(Request $request): JsonResponse
+    public function user(): JsonResponse
     {
         $user = auth()->user();
 
