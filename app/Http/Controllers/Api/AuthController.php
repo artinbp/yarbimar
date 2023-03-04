@@ -68,7 +68,8 @@ class AuthController extends Controller
 
     public function user(Request $request): JsonResponse
     {
-        $user = $request->user()->get();
+        $user = $request->user();
+
 
         return response()->json($user, Response::HTTP_OK);
     }

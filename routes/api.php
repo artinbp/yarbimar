@@ -119,4 +119,5 @@ Route::post('/v1/cart/remove', [CartController::class, 'remove'])->middleware('a
 
 Route::get('/v1/categories', [CategoryController::class, 'list']);
 Route::get('/v1/products', [ProductController::class, 'list']);
+Route::get('/v1/products/{id}', [ProductController::class, 'read']);
 Route::get('/v1/carousel', [CarouselController::class, 'list']);

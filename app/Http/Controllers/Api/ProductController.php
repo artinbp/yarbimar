@@ -23,4 +23,11 @@ class ProductController extends Controller
 
         return response()->json($products, Response::HTTP_OK);
     }
+    public function read(Request $request,$id): JsonResponse
+    {
+        $products = Product::all()->where('id', '=', $id)->first();
+
+
+        return response()->json($products, Response::HTTP_OK);
+    }
 }
